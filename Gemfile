@@ -9,12 +9,14 @@ gem 'pg'
 
 gem 'therubyracer'
 gem 'jquery-rails'
+gem 'hpricot' #need for haml-rails html2haml converter
+gem 'ruby_parser' #need for haml-rails html2haml converter
 gem 'haml-rails'
 gem 'hirb'
 gem 'awesome_print'
 gem 'annotate', :git => 'git://github.com/ctran/annotate_models.git'
 
-#gem 'devise'
+gem 'devise'
 gem 'simple_form'
 #gem 'will_paginate'
 #gem 'carrierwave'
