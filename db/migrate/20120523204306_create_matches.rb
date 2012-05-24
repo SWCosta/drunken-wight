@@ -3,6 +3,10 @@ class CreateMatches < ActiveRecord::Migration
     create_table :matches do |t|
       t.references :cup
       t.references :stage
+      t.references :home
+      t.references :guest
+
+      t.datetime :date
 
       t.timestamps
     end

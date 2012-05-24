@@ -29,6 +29,9 @@ ActiveRecord::Schema.define(:version => 20120523215400) do
   create_table "matches", :force => true do |t|
     t.integer  "cup_id"
     t.integer  "stage_id"
+    t.integer  "home_id"
+    t.integer  "guest_id"
+    t.datetime "date"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
@@ -44,6 +47,7 @@ ActiveRecord::Schema.define(:version => 20120523215400) do
 
   create_table "teams", :force => true do |t|
     t.string   "country"
+    t.integer  "stage_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
