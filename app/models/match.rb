@@ -6,4 +6,6 @@ class Match < ActiveRecord::Base
 
   has_many :bets
   has_many :users, through: :bets
+
+  scope :stage, lambda{ |id| where(:stage_id => id) }
 end

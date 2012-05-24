@@ -1,2 +1,7 @@
-%h1 Matches#index
-%p Find me in app/views/matches/index.html.haml
+%h1= @cup.name
+
+= @matches.inspect
+
+= @matches.each do |match|
+  = match.home.inspect
+  = match.guest.inspect
