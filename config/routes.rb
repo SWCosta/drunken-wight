@@ -1,6 +1,4 @@
 Tippspiel::Application.routes.draw do
-  get "matches/index"
-
   devise_for :users
 
   get "public/index"
