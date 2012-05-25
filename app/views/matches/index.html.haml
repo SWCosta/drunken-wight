@@ -24,21 +24,21 @@
           = link_to_country(match.guest.country)
         %td= link_to "Details", match_path(match)
 
-%table#standings
-  %thead
-    %th #
-    %th T
-    %th +
-    %th -
-    %th Δ
-    %th .
-  %tbody
-    - @standings.each.with_index do |standing,position|
-      %tr
-        %td= position + 1
-        %td= standing.team.country
-        %td= standing.shot
-        %td= standing.got
-        %td= standing.diff
-        %td= standing.overall_points
-
+- if @standings
+  %table#standings
+    %thead
+      %th #
+      %th T
+      %th +
+      %th -
+      %th Δ
+      %th .
+    %tbody
+      - @standings.each.with_index do |standing,position|
+        %tr
+          %td= position + 1
+          %td= standing.team.country
+          %td= standing.shot
+          %td= standing.got
+          %td= standing.diff
+          %td= standing.overall_points

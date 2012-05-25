@@ -7,8 +7,10 @@ class MatchesController < ApplicationController
   helper_method :current_stage, :current_match
 
   def index
-    @matches = @cup.matches.stage(current_stage)
+    stage_id = current_stage.is_a?(Stage) ? current_stage.id : nil
+    @matches = @cup.matches.stage(stage_id)
     @standings = current_stage.standings
+  rescue ArgumentError
   end
 
   def show

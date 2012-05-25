@@ -14,7 +14,7 @@ class Standing
   end
 
   def get_results(args)
-    if Stage::WITH_STANDINGS.include?(stage) || stage.nil?
+    if Stage::GROUPS.include?(stage) || stage.nil?
       Match.find_by_sql(standings_query(args))
     else
       raise ArgumentError

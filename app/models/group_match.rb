@@ -1,0 +1,2 @@
+class GroupMatch < Match
+end

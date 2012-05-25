@@ -10,11 +10,9 @@ puts "creating stages"
 ("A".."D").each do |char|
   Stage.create! name: "Group #{char}"
 end
-Stage.create! name: "Round of 16"
-Stage.create! name: "Round of 8"
-Stage.create! name: "Semifinal"
-Stage.create! name: "Match for 3rd Place"
-Stage.create! name: "Final"
+qf = Stage.create! name: "Quarterfinal"
+sf = Stage.create! name: "Semifinal"
+f = Stage.create! name: "Final"
 
 puts "creating the cup"
 euro2012 = Cup.create! name: "Euro 2012"
@@ -54,8 +52,25 @@ timetable =<<EOF
 19 Jun;	20:45;	Donetsk; UKR;	England;			Ukraine;	Group D
 EOF
 
+quarterfinals_data =<<EOF
+21 Jun;	20:45;	Warsaw; POL;	Group A Winner;			Group B Runner-up;	Quarterfinal
+22 Jun;	20:45;	Gdansk; POL;	Group B Winner;			Group A Runner-up;	Quarterfinal
+23 Jun;	20:45;	Donetsk; UKR;	Group C Winner;			Group D Runner-up;	Quarterfinal
+24 Jun;	20:45;	Kyiv; UKR;	Group D Winner;			Group C Runner-up;	Quarterfinal
+EOF
 
-groups = Stage.where("NAME like 'Group%'").inject({}) do |hash,group|
+semifinals_data =<<EOF
+27 Jun;	20:45;	Donetsk; UKR;	Quarter Final 1 Winner;			Quarter Final 3 Winner;	Semifinal
+28 Jun;	20:45;	Warsaw; POL;	Quarter Final 2 Winner;			Quarter Final 4 Winner;	Semifinal
+EOF
+
+final_data =<<EOF
+1 Jul;	20:45;	Kyiv; UKR;	Semi Final 1 Winner;			Semi Final 2 Winner;	Final
+EOF
+
+
+
+groups = Stage.scoped.inject({}) do |hash,group|
   hash[group.name.to_sym] = group.id
   hash
 end
@@ -65,27 +80,70 @@ teams = Team.all.inject({}) do |hash, team|
   hash
 end
 
-puts "creating the matches in the group period"
+puts "creating the play offs"
 
-text = StringIO.new(timetable)
-text.each do |line|
+def extract_data(line)
+  result = []
   data = line.split(";")
   data.map(&:strip!)
   day, month = data[0].split(/ /)
   hour, minute = data[1].split(":")
-  date = Time.local(2012, month, day, hour, minute)
-  place = data[2]
-  country = data[3]
-  home = data[4]
-  guest = data[5]
-  group = data[6]
+  result << Time.local(2012, month, day, hour, minute)
+  result << data[2]
+  result << data[3]
+  result << data[4]
+  result << data[5]
+  result << data[6]
+  result
+end
+
+#round_of_16 = 8.times.inject([]) do |matches, i|
+  
+puts "creating the matches in the group period"
+
+text = StringIO.new(timetable)
+text.each do |line|
+  date, place, country, home, guest, group = extract_data(line)
 
   # create models here
-  Match.create! cup: euro2012,
-                stage_id: groups[group.to_sym],
-                home_id: teams[home.to_sym],
-                guest_id: teams[guest.to_sym],
-                date: date
+  GroupMatch.create! cup: euro2012,
+                     stage_id: groups[group.to_sym],
+                     home_id: teams[home.to_sym],
+                     guest_id: teams[guest.to_sym],
+                     date: date
+end
+
+puts "creating playoffs"
+
+final = nil
+text = StringIO.new final_data
+text.each do |line|
+  date, place, country, home, guest, group = extract_data(line)
+  final = PlayOff.create! cup: euro2012,
+                          stage_id: groups[group.to_sym],
+                          date: date
+end
+
+semifinals = []
+text = StringIO.new semifinals_data
+text.each do |line|
+  date, place, country, home, guest, group = extract_data(line)
+  semifinals << (PlayOff.create! cup: euro2012,
+                                 stage_id: groups[group.to_sym],
+                                 date: date,
+                                 following_id: final.id)
+end
+
+quarterfinals = []
+text = StringIO.new quarterfinals_data
+text.each do |line|
+  date, place, country, home, guest, group = extract_data(line)
+  4.times do |i|
+    quarterfinals[i] = PlayOff.create! cup: euro2012,
+                                       stage_id: groups[group.to_sym],
+                                       date: date,
+                                       following_id: semifinals[i%2].id
+  end
 end
 
 puts "creating some match results"
