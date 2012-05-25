@@ -1,7 +1,8 @@
 class MatchesController < ApplicationController
   def index
-    stage_id = params[:stage] || "1"
+    @current_stage = params[:stage] || "1"
     @cup = Cup.first
-    @matches = @cup.matches.stage(stage_id)
+    @matches = @cup.matches.stage(@current_stage)
+    @stages = Stage.all
   end
 end

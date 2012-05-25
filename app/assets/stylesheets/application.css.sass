@@ -1,5 +1,47 @@
 @import "compass"
+@import "compass/reset"
 
-p
-  border: 1px solid black
-  +border-radius(8px)
+$blueprint_grid_columns: 24
+$blueprint_grid_width: 40px
+
+@import "blueprint"
+
+$icon-margin: 2px
+
+$countries-sprite-dimensions: true
+$countries-sprite-base-class: "icon-countries"
+@import "countries/*.png"
++all-countries-sprites
+$country-height: countries-sprite-height(sweden)
+$country-width: countries-sprite-width(sweden)
+
+=icons($height, $width, $margin: $icon-margin)
+  display: inline-block
+  width: $width
+  height: $height
+  line-height: $height
+  vertical-align: text-top
+  margin: $margin
+
+i[class^=countries]
+  +icons($country-height, 20px)
+
+#content
+  +container
+  //+showgrid
+  #header, #footer
+    +column($blueprint_grid_columns)
+    +background-image(linear-gradient(#c5c5c5,#3d3d3d))
+  #nav
+    +column($blueprint_grid_columns/4)
+  #main
+    +column($blueprint_grid_columns*3/4, true)
+
+#stages_nav
+  +horizontal-list
+  .current
+    font-weight: bold
+
+table#matches
+  td:nth-child(2)
+    text-align: right

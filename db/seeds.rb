@@ -20,7 +20,7 @@ puts "creating the cup"
 euro2012 = Cup.create! name: "Euro 2012"
 
 puts "creating teams in groups"
-teams = ["Polen", "Niederlande", "Spanien", "Ukraine", "Griechenland", "Dänemark", "Italien", "Schweden", "Russland", "Deutschland", "Irland", "Frankreich", "Tschechien", "Portugal", "Kroatien", "England"]
+teams = ["Poland", "Netherlands", "Spain", "Ukraine", "Greece", "Denmark", "Italy", "Sweden", "Russia", "Germany", "Republic of Ireland", "France", "Czech Republic", "Portugal", "Croatia", "England"]
 Stage.where("name like 'Gruppe%'").order('name asc').each.with_index do |group,index|
   index.step( teams.count - 1, 4 ).each do |i|
     group.teams.create! country: teams[i]
@@ -81,7 +81,7 @@ text.each do |line|
   # create models here
   Match.create! cup: euro2012,
                 stage_id: groups[group.to_sym],
-                home_id: teams[I18n.t("countries.#{home.parameterize}").to_sym],
-                guest_id: teams[I18n.t("countries.#{guest.parameterize}").to_sym],
+                home_id: teams[home.to_sym],
+                guest_id: teams[guest.to_sym],
                 date: date
 end

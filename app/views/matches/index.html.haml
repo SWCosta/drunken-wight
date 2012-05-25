@@ -1,7 +1,26 @@
-%h1= @cup.name
+%ul#stages_nav
+  - @stages.each do |stage|
+    %li{ :class => stage.id.to_s == @current_stage && "current" }
+      = link_to stage.name, matches_path(:stage => stage.id)
 
-= @matches.inspect
+%table#matches
+  %thead
+    %th Datum
+    %th
+    %th
+    %th
+    %th
+  %tbody
+    - @matches.each do |match|
+      %tr
+        %td
+          = match.date.strftime("%d.%m")
+          = match.date.strftime("%H:%M")
+        %td
+          = link_to_country(match.guest.country, "right")
+        %td 0
+        %td 0
+        %td
+          = link_to_country(match.home.country)
 
-= @matches.each do |match|
-  = match.home.inspect
-  = match.guest.inspect
+
