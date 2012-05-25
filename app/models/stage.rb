@@ -5,7 +5,7 @@ class Stage < ActiveRecord::Base
 
   def standings(*args)
     args.extract_options!
-    Stage.find_by_sql(standings_query(args))
+    Match.find_by_sql(standings_query(args))
   end
 
   private
@@ -13,14 +13,15 @@ class Stage < ActiveRecord::Base
   def standings_query(args)
     query= <<EOF
 SELECT
-	country_id,
+  stage_id,
+  country_id AS home_id,
 	sum(own) as shot,
 	sum(other) as got,
 	sum(points) as overall_points
 FROM
 	(
 	SELECT 
-	  id, home_id as country_id, home_score as own, guest_score as other,
+	  stage_id, home_id as country_id, home_score as own, guest_score as other,
 	  CASE WHEN home_score < guest_score THEN 0
 	       WHEN home_score > guest_score THEN 3
 	       WHEN home_score = guest_score THEN 1
@@ -31,7 +32,7 @@ FROM
 	UNION
 
 	SELECT 
-	  id, guest_id as country_id, guest_score as own, home_score as other,
+	  stage_id, guest_id as country_id, guest_score as own, home_score as other,
 	  CASE WHEN guest_score < home_score THEN 0
 	       WHEN guest_score > home_score THEN 3
 	       WHEN guest_score = home_score THEN 1
@@ -41,7 +42,7 @@ FROM
 	)
 	
 AS results
-GROUP BY country_id
+GROUP BY country_id, stage_id
 ORDER BY overall_points DESC
 EOF
   end
