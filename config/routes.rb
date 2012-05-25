@@ -3,7 +3,8 @@ Tippspiel::Application.routes.draw do
 
   get "public/index"
 
-  resources :matches
+  resources :matches, only: [:index, :show, :edit, :update],
+                      path_names: { edit: 'result' }
 
   root to: "public#index"
 

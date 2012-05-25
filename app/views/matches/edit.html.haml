@@ -1,0 +1,8 @@
+= render 'stages_navigation'
+
+= render 'match_headline'
+
+= simple_form_for @match do |f|
+  = f.input :home_score, input_html: { maxlength: 1 }
+  = f.input :guest_score, input_html: { maxlength: 1 }
+  = f.button :submit

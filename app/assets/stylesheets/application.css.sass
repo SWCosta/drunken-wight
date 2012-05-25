@@ -37,11 +37,16 @@ i[class^=countries]
   #main
     +column($blueprint_grid_columns*3/4, true)
 
-#stages_nav
-  +horizontal-list
+//#stages_nav
+#cup_nav
+  ul
+    +horizontal-list
   .current
     font-weight: bold
 
 table#matches
   td:nth-child(2)
     text-align: right
+
+.winner
+  background-color: green

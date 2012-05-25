@@ -10,4 +10,8 @@ module ApplicationHelper
   def icon(namespace=nil,name)
     content_tag :i, :class => [namespace,name.parameterize].join("-") do; end
   end
+
+  def country_image(name)
+    image_tag File.join("countries", name.parameterize+".png")
+  end
 end

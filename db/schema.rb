@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120523215400) do
+ActiveRecord::Schema.define(:version => 20120525021622) do
 
   create_table "bets", :force => true do |t|
     t.integer  "user_id"
@@ -32,8 +32,10 @@ ActiveRecord::Schema.define(:version => 20120523215400) do
     t.integer  "home_id"
     t.integer  "guest_id"
     t.datetime "date"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.integer  "home_score"
+    t.integer  "guest_score"
   end
 
   add_index "matches", ["cup_id"], :name => "index_matches_on_cup_id"

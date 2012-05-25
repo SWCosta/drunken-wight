@@ -8,20 +8,20 @@ User.create!( :email => "foobar@example.com",
 
 puts "creating stages"
 ("A".."D").each do |char|
-  Stage.create! name: "Gruppe #{char}"
+  Stage.create! name: "Group #{char}"
 end
-Stage.create! name: "Achtelfinale"
-Stage.create! name: "Viertelfinale"
-Stage.create! name: "Halbfinale"
-Stage.create! name: "Spiel um Platz 3"
-Stage.create! name: "Finale"
+Stage.create! name: "Round of 16"
+Stage.create! name: "Round of 8"
+Stage.create! name: "Semifinal"
+Stage.create! name: "Match for 3rd Place"
+Stage.create! name: "Final"
 
 puts "creating the cup"
 euro2012 = Cup.create! name: "Euro 2012"
 
 puts "creating teams in groups"
 teams = ["Poland", "Netherlands", "Spain", "Ukraine", "Greece", "Denmark", "Italy", "Sweden", "Russia", "Germany", "Republic of Ireland", "France", "Czech Republic", "Portugal", "Croatia", "England"]
-Stage.where("name like 'Gruppe%'").order('name asc').each.with_index do |group,index|
+Stage.where("name like 'Group%'").order('name asc').each.with_index do |group,index|
   index.step( teams.count - 1, 4 ).each do |i|
     group.teams.create! country: teams[i]
   end
@@ -54,8 +54,9 @@ timetable =<<EOF
 19 Jun;	20:45;	Donetsk; UKR;	England;			Ukraine;	Group D
 EOF
 
-groups = Stage.where("NAME like 'Gruppe%'").inject({}) do |hash,group|
-  hash[group.name.sub(/Gruppe/,"Group").to_sym] = group.id
+
+groups = Stage.where("NAME like 'Group%'").inject({}) do |hash,group|
+  hash[group.name.to_sym] = group.id
   hash
 end
 
@@ -64,6 +65,7 @@ teams = Team.all.inject({}) do |hash, team|
   hash
 end
 
+puts "creating the matches in the group period"
 
 text = StringIO.new(timetable)
 text.each do |line|
@@ -84,4 +86,12 @@ text.each do |line|
                 home_id: teams[home.to_sym],
                 guest_id: teams[guest.to_sym],
                 date: date
+end
+
+puts "creating some match results"
+
+Stage.first.matches.each do |match|
+  int = proc { (rand*10).round() - 1}
+  match.result = Result.new(int.call, int.call)
+  match.save
 end
