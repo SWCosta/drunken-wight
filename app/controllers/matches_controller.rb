@@ -8,6 +8,7 @@ class MatchesController < ApplicationController
 
   def index
     @matches = @cup.matches.stage(current_stage)
+    @standings = current_stage.standings
   end
 
   def show
@@ -30,7 +31,7 @@ class MatchesController < ApplicationController
   private
 
   def current_stage
-    @current_stage ||= (Stage.find(params[:stage]) rescue nil)
+    @current_stage ||= (Stage.find(params[:stage]) rescue @cup)
   end
 
   def current_match

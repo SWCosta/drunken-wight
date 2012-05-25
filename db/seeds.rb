@@ -91,7 +91,7 @@ end
 puts "creating some match results"
 
 Stage.first.matches.each do |match|
-  int = proc { (rand*10).round() - 1}
+  int = proc { ((rand*10).round() - 1)%3}
   match.result = Result.new(int.call, int.call)
   match.save
 end

@@ -27,6 +27,11 @@ class Match < ActiveRecord::Base
            :home => home, :guest => guest)
   end
 
+  # so you can call Stage.first.standings.first.team
+  def team
+    home
+  end
+
   def winner
     choose_team_from_comparison(result.toto)
   end

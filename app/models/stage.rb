@@ -1,50 +1,13 @@
 class Stage < ActiveRecord::Base
+  WITH_STANDINGS = Stage.where("name LIKE 'Group%'").map(&:id)
+
   has_many :matches
   has_many :teams
   has_one :cup, through: :matches
 
   def standings(*args)
-    args.extract_options!
-    Match.find_by_sql(standings_query(args))
+    options = args.extract_options!
+    options[:stage_id] = self.id
+    Standing.new(options).results
   end
-
-  private
-
-  def standings_query(args)
-    query= <<EOF
-SELECT
-  stage_id,
-  country_id AS home_id,
-	sum(own) as shot,
-	sum(other) as got,
-	sum(points) as overall_points
-FROM
-	(
-	SELECT 
-	  stage_id, home_id as country_id, home_score as own, guest_score as other,
-	  CASE WHEN home_score < guest_score THEN 0
-	       WHEN home_score > guest_score THEN 3
-	       WHEN home_score = guest_score THEN 1
-	  END AS points
-	  FROM matches
-	  WHERE stage_id = 1
-
-	UNION
-
-	SELECT 
-	  stage_id, guest_id as country_id, guest_score as own, home_score as other,
-	  CASE WHEN guest_score < home_score THEN 0
-	       WHEN guest_score > home_score THEN 3
-	       WHEN guest_score = home_score THEN 1
-	  END AS points
-	  FROM matches
-	  WHERE stage_id = 1
-	)
-	
-AS results
-GROUP BY country_id, stage_id
-ORDER BY overall_points DESC
-EOF
-  end
-
 end
