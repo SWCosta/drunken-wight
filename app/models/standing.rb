@@ -5,16 +5,15 @@ class Standing
   end
 
   attr_reader :results
-  attr_accessor :stage
+  attr_accessor :group
 
-  def initialize(args)
-    @args = args
-    @stage = args[:stage_id]
+  def initialize(args={})
+    @group = args[:group_id]
     @results = get_results(args)
   end
 
-  def get_results(args)
-    if Stage::GROUPS.include?(stage) || stage.nil?
+  def get_results(args={})
+    if Stage::GROUPS.include?(group) || group.nil?
       Match.find_by_sql(standings_query(args))
     else
       raise ArgumentError
@@ -24,41 +23,58 @@ class Standing
   private
 
   def standings_query(args)
-    args[:order_by] ||= "overall_points DESC NULLS LAST, diff DESC NULLS LAST"
+    args[:order_by] ||= "points DESC NULLS LAST, diff DESC NULLS LAST"
     raise ArgumentError, ":order_by muss ein String sein" unless args[:order_by].is_a? String
     query= <<EOF
-SELECT
-  stage_id,
-  country_id AS home_id,
-	sum(own) as shot,
-	sum(other) as got,
-  sum(own) - sum(other) as diff,
-	sum(points) as overall_points
+SELECT	team_id,
+	sum(own_score)		AS	shot,
+	sum(other_score)	AS	got,
+	sum(own_score) - sum(other_score)	AS	diff,
+	sum(	CASE	WHEN	own_score > other_score	THEN	3
+			WHEN	own_score < other_score	THEN	0
+			WHEN	own_score = other_score THEN 	1
+			ELSE	0
+		END)	AS points,
+	sum(	CASE	WHEN	own_score IS NOT NULL	THEN	1
+		ELSE	0
+		END) 	AS games
 FROM
 	(
-	SELECT 
-	  id, stage_id, home_id as country_id, home_score as own, guest_score as other,
-	  CASE WHEN home_score < guest_score THEN 0
-	       WHEN home_score > guest_score THEN 3
-	       WHEN home_score = guest_score THEN 1
-	  END AS points
-	  FROM matches
-	  #{stage && "WHERE stage_id = #{stage}"}
+	SELECT 	matches.id,
+		mp.team_id,
+		CASE	WHEN	mp.role = 0	THEN	matches.home_score
+			ELSE	matches.guest_score
+		END	AS	own_score,
+		CASE	WHEN	mp.role = 1	THEN	matches.home_score
+			ELSE	matches.guest_score
+		END	AS	other_score,
+		CASE	WHEN	mp.role = 0	THEN	mp.team_id
+			ELSE	other.team_id
+		END	AS	home_team_id,
+		CASE	WHEN	mp.role = 0	THEN 	other.team_id
+			ELSE	mp.team_id
+		END	AS	guest_team_id,
+		matches.home_score,
+		matches.guest_score,
+		mp.role
+		
+	FROM		matches
+			LEFT OUTER JOIN	match_participations
+			AS		mp
+			ON		matches.id = mp.match_id
+			INNER JOIN	match_participations
+			AS		other
+			ON		(mp.match_id = other.match_id AND mp.role <> other.role)
 
-	UNION
-
-	SELECT 
-	  id, stage_id, guest_id as country_id, guest_score as own, home_score as other,
-	  CASE WHEN guest_score < home_score THEN 0
-	       WHEN guest_score > home_score THEN 3
-	       WHEN guest_score = home_score THEN 1
-	  END AS points
-	  FROM matches
-	  #{stage && "WHERE stage_id = #{stage}"}
+	WHERE	mp.team_id	IN
+		(
+		SELECT	teams.id
+		FROM	teams
+	  #{group && "WHERE group_id = #{group}"}
+		)
 	)
-	
-AS results
-GROUP BY country_id, stage_id
+AS		results
+GROUP BY	team_id
 ORDER BY #{args[:order_by]}
 EOF
   end
