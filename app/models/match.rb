@@ -48,6 +48,7 @@ class Match < ActiveRecord::Base
     int == 1 ? home : ( int == -1 ? guest : nil )
   end
 
+  # TODO: remove
   def conditional_home_and_parent
     return if home_id
     class << self

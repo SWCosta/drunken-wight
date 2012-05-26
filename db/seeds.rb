@@ -136,14 +136,12 @@ end
 
 quarterfinals = []
 text = StringIO.new quarterfinals_data
-text.each do |line|
+text.each.with_index do |line,i|
   date, place, country, home, guest, group = extract_data(line)
-  4.times do |i|
-    quarterfinals[i] = PlayOff.create! cup: euro2012,
-                                       stage_id: groups[group.to_sym],
-                                       date: date,
-                                       following_id: semifinals[i%2].id
-  end
+  quarterfinals[i] = PlayOff.create! cup: euro2012,
+                                     stage_id: groups[group.to_sym],
+                                     date: date,
+                                     following_id: semifinals[i%2].id
 end
 
 puts "creating some match results"
