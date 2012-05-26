@@ -3,7 +3,7 @@ class Stage < ActiveRecord::Base
   PLAY_OFFS = Stage.where("name NOT LIKE 'Group%'").map(&:id)
 
   has_many :matches
-  has_many :teams
+  #has_many :teams #TODO: check is that is used
   has_one :cup, through: :matches
 
   def standings(*args)

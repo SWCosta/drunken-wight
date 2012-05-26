@@ -6,20 +6,24 @@ User.create!( :email => "yuszuv@gmx.de",
 User.create!( :email => "foobar@example.com",
               :password => "foobar" )
 
-puts "creating stages"
-("A".."D").each do |char|
-  Stage.create! name: "Group #{char}"
-end
+pre = Stage.create! name: "Preliminary Round"
 qf = Stage.create! name: "Quarterfinal"
 sf = Stage.create! name: "Semifinal"
 f = Stage.create! name: "Final"
+
+puts "creating stages"
+("A".."D").each do |char|
+  Group.create! name: "Group #{char}",
+                stage: pre
+end
 
 puts "creating the cup"
 euro2012 = Cup.create! name: "Euro 2012"
 
 puts "creating teams in groups"
 teams = ["Poland", "Netherlands", "Spain", "Ukraine", "Greece", "Denmark", "Italy", "Sweden", "Russia", "Germany", "Republic of Ireland", "France", "Czech Republic", "Portugal", "Croatia", "England"]
-Stage.where("name like 'Group%'").order('name asc').each.with_index do |group,index|
+
+Group.order('name asc').each.with_index do |group,index|
   index.step( teams.count - 1, 4 ).each do |i|
     group.teams.create! country: teams[i]
   end
@@ -68,15 +72,21 @@ final_data =<<EOF
 1 Jul;	20:45;	Kyiv; UKR;	Semi Final 1 Winner;			Semi Final 2 Winner;	Final
 EOF
 
+puts "mapping source data"
 
-
-groups = Stage.scoped.inject({}) do |hash,group|
+groups = Group.scoped.inject({}) do |hash,group|
   hash[group.name.to_sym] = group.id
   hash
 end
 
+stages = Stage.scoped.inject({}) do |hash,stage|
+  hash[stage.name.to_sym] = stage.id
+  hash
+end
+
 teams = Team.all.inject({}) do |hash, team|
-  hash[team.country.to_sym] = team.id
+  #hash[team.country.to_sym] = team.id
+  hash[team.country.to_sym] = team
   hash
 end
 
@@ -88,12 +98,13 @@ def extract_data(line)
   data.map(&:strip!)
   day, month = data[0].split(/ /)
   hour, minute = data[1].split(":")
+  stage = data[6].sub(/Group.*/,"Preliminary Round")
   result << Time.local(2012, month, day, hour, minute)
   result << data[2]
   result << data[3]
   result << data[4]
   result << data[5]
-  result << data[6]
+  result << stage
   result
 end
 
@@ -103,13 +114,13 @@ puts "creating the matches in the group period"
 
 text = StringIO.new(timetable)
 text.each do |line|
-  date, place, country, home, guest, group = extract_data(line)
+  date, place, country, home, guest, stage = extract_data(line)
 
   # create models here
   GroupMatch.create! cup: euro2012,
-                     stage_id: groups[group.to_sym],
-                     home_id: teams[home.to_sym],
-                     guest_id: teams[guest.to_sym],
+                     stage_id: stages[stage.to_sym],
+                     home: teams[home.to_sym],
+                     guest: teams[guest.to_sym],
                      date: date
 end
 
@@ -118,18 +129,18 @@ puts "creating playoffs"
 final = nil
 text = StringIO.new final_data
 text.each do |line|
-  date, place, country, home, guest, group = extract_data(line)
+  date, place, country, home, guest, stage = extract_data(line)
   final = PlayOff.create! cup: euro2012,
-                          stage_id: groups[group.to_sym],
+                          stage_id: stages[stage.to_sym],
                           date: date
 end
 
 semifinals = []
 text = StringIO.new semifinals_data
 text.each do |line|
-  date, place, country, home, guest, group = extract_data(line)
+  date, place, country, home, guest, stage = extract_data(line)
   semifinals << (PlayOff.create! cup: euro2012,
-                                 stage_id: groups[group.to_sym],
+                                 stage_id: stages[stage.to_sym],
                                  date: date,
                                  following_id: final.id)
 end
@@ -137,9 +148,9 @@ end
 quarterfinals = []
 text = StringIO.new quarterfinals_data
 text.each.with_index do |line,i|
-  date, place, country, home, guest, group = extract_data(line)
+  date, place, country, home, guest, stage = extract_data(line)
   quarterfinals[i] = PlayOff.create! cup: euro2012,
-                                     stage_id: groups[group.to_sym],
+                                     stage_id: stages[stage.to_sym],
                                      date: date,
                                      following_id: semifinals[i%2].id
 end

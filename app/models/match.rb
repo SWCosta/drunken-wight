@@ -1,12 +1,21 @@
 class Match < ActiveRecord::Base
   belongs_to :cup
   belongs_to :stage
-  belongs_to :home, class_name: "Team"
-  belongs_to :guest, class_name: "Team"
+  has_many :match_participations
+  has_many :teams, through: :match_participations
+  has_one :home_participation, class_name: "MatchParticipation",
+                               conditions: { role: 0 }
+  has_one :home, through: :home_participation,
+                 source: :team
+  has_one :guest_participation, class_name: "MatchParticipation",
+                                conditions: { role: 1 }
+  has_one :guest, through: :guest_participation,
+                  source: :team
 
   has_many :bets
   has_many :users, through: :bets
 
+  # should that be in MatchParticipation ?
   composed_of :result, mapping: [%w(home_score home), %w(guest_score guest)]
 
   validates :home_score, numericality: { only_integer: true,

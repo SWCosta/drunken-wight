@@ -2,9 +2,6 @@ class MatchPresenter < BasePresenter
   presents :match
   #delegate :username, to: :user
 
-  def home
-    !!match.home ? match.home.country : match.handle_no_team
-  end
 
   def avatar
     site_link image_tag("avatars/#{avatar_name}", class: "avatar")

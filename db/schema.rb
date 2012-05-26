@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120525222141) do
+ActiveRecord::Schema.define(:version => 20120526183043) do
 
   create_table "bets", :force => true do |t|
     t.integer  "user_id"
@@ -26,11 +26,29 @@ ActiveRecord::Schema.define(:version => 20120525222141) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "groups", :force => true do |t|
+    t.string   "name"
+    t.integer  "stage_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "groups", ["stage_id"], :name => "index_groups_on_stage_id"
+
+  create_table "match_participations", :force => true do |t|
+    t.integer  "match_id"
+    t.integer  "team_id"
+    t.integer  "role"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "match_participations", ["match_id"], :name => "index_match_participations_on_match_id"
+  add_index "match_participations", ["team_id"], :name => "index_match_participations_on_team_id"
+
   create_table "matches", :force => true do |t|
     t.integer  "cup_id"
     t.integer  "stage_id"
-    t.integer  "home_id"
-    t.integer  "guest_id"
     t.datetime "date"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
@@ -51,7 +69,7 @@ ActiveRecord::Schema.define(:version => 20120525222141) do
 
   create_table "teams", :force => true do |t|
     t.string   "country"
-    t.integer  "stage_id"
+    t.integer  "group_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
