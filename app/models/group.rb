@@ -2,10 +2,11 @@ class Group < Stage
   IDS = Group.all.map(&:id)
 
   has_many :teams
+  has_one :standing, as: :rateable
 
-  composed_of :standings, mapping: [%w(id group)],
-                          class_name: "Standing",
-                          constructor: proc { |a| Standing.new({:group_id => a}) }
+#  composed_of :standings, mapping: [%w(id group)],
+#                          class_name: "Standing",
+#                          constructor: proc { |a| Standing.new({:group_id => a}) }
 
   #TODO: make this better
   def has_finished?

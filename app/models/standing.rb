@@ -1,23 +1,57 @@
-class Standing
-  attr_reader :results, :group, :cup, :conn
+class Standing < ActiveRecord::Base
+  belongs_to :rateable, polymorphic: true
 
-  def initialize(args={})
-    @conn = ActiveRecord::Base.connection
-    @group = args[:group_id]
-    @cup = args[:cup_id] || Group.find(@group).cup.id
-    @results = get_results(args).to_a
+  attr_reader :conn, :group, :cup
+
+  store :data, accessors: [:rank_col, :team_col, :shot_col, :got_col, :points_col, :matches_col]
+
+  after_initialize :set_group_and_cup
+
+  def self.refresh(args={})
+    all.each { |rec| rec.refresh(args) }
   end
 
-  #helper methods for getting nice hirb output
+  def refresh(args={})
+    set_group_and_cup
+    results = get_results(args)
+  end
+
+  def set_connection
+    @conn ||= ActiveRecord::Base.connection
+  end
+
   def get_results(args={})
-    array = conn.exec_query(standings_query(args)).to_a
-    table = array.inject([]) do |result,match|
-      result << StandingRow.new(match["team_id"],match["shot"], match["got"], match["diff"], match["points"], match["matches"])
-    end
+    set_connection
+    conn.exec_query(standings_query(args)).to_a
   end
 
-  private
+  def set_group_and_cup
+    @group ||= !!(rateable_type == "Stage") ? rateable_id : nil
+    @cup ||= !!(rateable_type == "Cup") ? rateable_id : Group.find(group).cup.id
+  end
 
+
+
+
+#  attr_reader :results, :group, :cup, :conn
+#
+#  def initialize(args={})
+#    @conn = ActiveRecord::Base.connection
+#    @group = args[:group_id]
+#    @cup = args[:cup_id] || Group.find(@group).cup.id
+#    @results = get_results(args).to_a
+#  end
+#
+#  #helper methods for getting nice hirb output
+#  def get_results(args={})
+#    array = conn.exec_query(standings_query(args)).to_a
+#    table = array.inject([]) do |result,match|
+#      result << StandingRow.new(match["team_id"],match["shot"], match["got"], match["diff"], match["points"], match["matches"])
+#    end
+#  end
+#
+#  private
+#
   def standings_query(args)
     args[:order_by] ||= "points DESC NULLS LAST, diff DESC NULLS LAST"
     raise ArgumentError, ":order_by muss ein String sein" unless args[:order_by].is_a? String
@@ -66,7 +100,7 @@ FROM
 		(
 		SELECT	teams.id
 		FROM	teams
-	  #{group && "WHERE group_id = #{group}"}
+	  #{group && "WHERE group_id = #{rateable_id}"}
 		)
     AND matches.cup_id = #{cup}
 	)
@@ -75,8 +109,8 @@ GROUP BY	team_id
 ORDER BY #{args[:order_by]}
 EOF
   end
-
-  def method_missing(name,*args)
-    results.send(name,*args)
-  end
+#
+#  def method_missing(name,*args)
+#    results.send(name,*args)
+#  end
 end

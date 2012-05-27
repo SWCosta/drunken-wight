@@ -161,3 +161,13 @@ Group.first.matches.each do |match|
   match.result = Result.new(int.call, int.call)
   match.save
 end
+
+puts "creating standings after results"
+
+Group.all.each do |group|
+  group.create_standing!
+end
+
+Cup.all.each do |cup|
+  cup.create_standing!
+end
