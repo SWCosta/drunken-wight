@@ -1,10 +1,11 @@
 class Cup < ActiveRecord::Base
-  has_many :matches, include: :teams
+  has_many :matches
   has_many :stages, through: :matches
   has_many :teams, through: :matches
 
-  composed_of :standing, mapping: [%w(id cup)],
-                         constructor: proc { |a| Standing.new( cup_id: a ) }
+  composed_of :standings, mapping: [%w(id cup)],
+                          class_name: "Standing",
+                          constructor: proc { |a| Standing.new( cup_id: a ) }
 
   # yields [group, position] to play quarterfinal x as y
   def quarterfinal_mapping(x,y)
@@ -14,9 +15,10 @@ class Cup < ActiveRecord::Base
   end
 
   # the winner of this n-th ancestors will play
-  def finals_mapping(id, role)
+  # doesn't work if there'd be a round of 16
+  def finals_mapping(id, role, match_count)
     role = { home: 0, guest: 1 }[role] if role.is_a? Symbol
-    1 + id + 2*role 
+    id + match_count*role 
   end
 
 end

@@ -28,7 +28,6 @@ class Match < ActiveRecord::Base
 
   default_scope order(:date)
 
-  scope :stage, lambda{ |id| id.present? ? where(:stage_id => id) : scoped }
   scope :with_result, lambda{ |home,guest| with_result_query(home,guest) }
 
   # get all results with 3:2 or 2:3 e.g.
@@ -43,10 +42,12 @@ class Match < ActiveRecord::Base
     home
   end
 
+  # returns a Team or nil
   def winner
     choose_team_from_comparison(result.toto)
   end
 
+  # returns a Team or nil
   def loser
     choose_team_from_comparison(-result.toto)
   end
@@ -54,16 +55,6 @@ class Match < ActiveRecord::Base
   private
 
   def choose_team_from_comparison(int)
-    int == 1 ? home : ( int == -1 ? guest : nil )
-  end
-
-  # TODO: remove
-  def conditional_home_and_parent
-    return if home_id
-    class << self
-      def home
-        "bla bla bla"
-      end
-    end
+    int == 1 ? home : ( int == -1 ? guest : nil ) rescue nil
   end
 end

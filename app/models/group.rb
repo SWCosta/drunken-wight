@@ -1,13 +1,16 @@
 class Group < Stage
   IDS = Group.all.map(&:id)
 
-  belongs_to :stage
   has_many :teams
-  has_many :matches, through: :teams,
-                     uniq: true
 
-  composed_of :standing, mapping: [%w(id group)],
-                         constructor: proc { |a| Standing.new({:group_id => a}) }
+  composed_of :standings, mapping: [%w(id group)],
+                          class_name: "Standing",
+                          constructor: proc { |a| Standing.new({:group_id => a}) }
+
+  #TODO: make this better
+  def has_finished?
+    standings.results.map(&:matches).map(&:to_i).min == (teams.count - 1)
+  end
 
   # checks if there is is a definite winner of a group
   def has_a?(position)

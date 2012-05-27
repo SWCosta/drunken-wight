@@ -1,16 +1,11 @@
 class MatchesController < ApplicationController
-  before_filter do
-    @cup = Cup.first
-    @stages = Stage.all
-  end
+  before_filter :load_cup_data
 
   helper_method :current_stage, :current_match
 
   def index
-    stage_id = current_stage.is_a?(Stage) ? current_stage.id : nil
-    @matches = @cup.matches.stage(stage_id)
+    @matches = current_stage.matches
     @standings = current_stage.standings
-  rescue ArgumentError
   end
 
   def show

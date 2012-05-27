@@ -5,62 +5,54 @@ class PlayOffMatch < Match
   has_many :parents, foreign_key: :following_id,
                      class_name: "PlayOffMatch"
 
-#  after_find :set_participants
+  #should be triggered otherwise
+  #after_find :set_participants
 
-#  def handle_no_team(role)
-#    roles = { home: 0, guest: 1 }
-#    if self.parents.present? #semifinals, final
-#      # 1/4 finals or 1/2 finals
-#      #group = self.p
-#      "Sieger von "
-#    else #quarterfinals
-#      #groups
-#      # where am i?
-#      x = Stage.find(self.stage.id).matches.reorder(:date).index(self)
-#      y = roles[role]
-#      group, rank = cup.quarterfinal_mapping(x,y)
-#      participant(group, rank) || no_team_text(group, rank)
-#    end
-#  end
-#
-#  private
-#
-#  def set_participants
-#    if !home
-#      #set home
-#      self.home = participant(:home)
-#    end
-#    if !guest
-#      self.guest = participant(:guest)
-#      puts "setting guest"
-#      #set guest
-#    end
-#  end
-#
-#  def undefined_participant
-#    Struct.new(:group, :rank)
-#  end
-#
-#  def participant(role)
-#    role = { home: 0, guest: 1 }[role] if role.is_a? Symbol
-#    index = stage.matches.reorder(:date).index(self)
-#    case stage.name
-#    when "Quarterfinal"
-#      group_id, position = cup.quarterfinal_mapping(index, role)
-#      group = Stage.where(id: Stage::GROUPS).reorder(:id)[group_id]
-#      group.has_finished? ? group.standings[position].team : undefined_participant(group_id, position)
-#    when "Semifinal", "Final"
-#      #
-#    end
-#  end
+  def get_default(role)
+    role = { home: 0, guest: 1 }[role] if role.is_a? Symbol
+    participant(role)
+  end
 
-#  def participant(group_id, rank)
-#    # check is the winner or runner-up already exists
-#    no = { 0 => :winner, 1 => :runner_up }[rank]
-#    group = Stage.where(id: Stage::GROUPS).reorder(:id)[group_id]
-#    #group.has_a?(no) ? group.get_the(no) : no_team_text(group_id, rank)
-#    group.has_a?(no) ? group.get_the(no) : undefined_participant.new(group_id, rank)
-#  end
+  private
+
+  def set_participants
+    if !home && participant(:home).is_a?(Team)
+      #set home
+      self.home = participant(:home)
+      save!
+    end
+    if !guest && participant(:guest).is_a?(Team)
+      #set guest
+      self.guest = participant(:guest)
+      save!
+    end
+  end
+
+  def undefined_participant_from_group(group_id,position)
+    Struct.new(:group_id, :rank).new(group_id,position)
+  end
+
+  def undefined_participant_from_match(match_id)
+    Struct.new(:match_id).new(match_id)
+  end
+
+  def participant(role)
+    role = { home: 0, guest: 1 }[role] if role.is_a? Symbol
+    index = Match.where(stage_id: self.stage_id).reorder(:date).select("id").map(&:id).index(self.id)
+    case stage.name
+    when "Quarterfinal"
+      group_index, position = cup.quarterfinal_mapping(index, role)
+      group = Group.where(id: Group::IDS).reorder(:id)[group_index]
+      group.has_finished? ? group.standings[position].team : undefined_participant_from_group(group_index, position)
+    when "Semifinal", "Final"
+      match_count = (stage.name == "Final") ? 1 : 2
+      pre_stage_index = cup.finals_mapping(index, role, match_count)
+      pre_stage = (stage.name == "Final") ? PlayOff.find_by_name("Semifinal") : PlayOff.find_by_name("Quarterfinal")
+      #playoff = PlayOff.where(id: PlayOff::IDS).reorder(:id)[pre_stage_index]
+      pre_match = Match.where(stage_id: pre_stage.id).reorder(:date).select("id")[pre_stage_index]
+      pre_match.winner || undefined_participant_from_match(pre_match.id)
+    end
+  end
 
   def no_team_text(group_id, rank)
     # generate text ouptput

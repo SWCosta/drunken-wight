@@ -1,16 +1,19 @@
 class Standing
-
-  attr_reader :results, :group, :cup
+  attr_reader :results, :group, :cup, :conn
 
   def initialize(args={})
+    @conn = ActiveRecord::Base.connection
     @group = args[:group_id]
-    @cup = args[:cup_id] || Group.find(@group).stage.cup.id
-    @results = get_results(args)
+    @cup = args[:cup_id] || Group.find(@group).cup.id
+    @results = get_results(args).to_a
   end
 
   #helper methods for getting nice hirb output
   def get_results(args={})
-    Match.find_by_sql(standings_query(args))
+    array = conn.exec_query(standings_query(args)).to_a
+    table = array.inject([]) do |result,match|
+      result << StandingRow.new(match["team_id"],match["shot"], match["got"], match["diff"], match["points"], match["matches"])
+    end
   end
 
   private
@@ -30,7 +33,7 @@ SELECT	team_id,
 		END)	AS points,
 	sum(	CASE	WHEN	own_score IS NOT NULL	THEN	1
 		ELSE	0
-		END) 	AS games
+		END) 	AS matches
 FROM
 	(
 	SELECT 	matches.id,
@@ -73,4 +76,7 @@ ORDER BY #{args[:order_by]}
 EOF
   end
 
+  def method_missing(name,*args)
+    results.send(name,*args)
+  end
 end
