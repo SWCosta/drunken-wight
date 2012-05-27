@@ -1,4 +1,5 @@
 class PlayOff < Match
+  IDS = PlayOff.all.map(&:id)
 
   belongs_to :following, class_name: "PlayOff"
   has_many :parents, foreign_key: :following_id,

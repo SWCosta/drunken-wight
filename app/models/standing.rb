@@ -1,23 +1,25 @@
 class Standing
 
-  def self.all(args = {})
-    new(args).results
-  end
+#  def inspect
+#    to_a.inspect
+#  end
 
-  attr_reader :results
-  attr_accessor :group
+# results for the whole cup
+#  def self.all(args = {})
+#    new(args).results
+#  end
+
+  attr_reader :results, :group, :cup
+  #attr_accessor :group
 
   def initialize(args={})
     @group = args[:group_id]
+    @cup = args[:cup_id] || Group.find(@group).stage.cup.id
     @results = get_results(args)
   end
 
   def get_results(args={})
-    if Stage::GROUPS.include?(group) || group.nil?
-      Match.find_by_sql(standings_query(args))
-    else
-      raise ArgumentError
-    end
+    Match.find_by_sql(standings_query(args))
   end
 
   private
@@ -72,6 +74,7 @@ FROM
 		FROM	teams
 	  #{group && "WHERE group_id = #{group}"}
 		)
+    AND matches.cup_id = #{cup}
 	)
 AS		results
 GROUP BY	team_id

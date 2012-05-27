@@ -1,5 +1,4 @@
 class Team < ActiveRecord::Base
-  belongs_to :stage
   belongs_to :group
 
   has_many :match_participations
