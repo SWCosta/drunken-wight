@@ -6,16 +6,16 @@ User.create!( :email => "yuszuv@gmx.de",
 User.create!( :email => "foobar@example.com",
               :password => "foobar" )
 
-pre = Stage.create! name: "Preliminary Round"
-qf = Stage.create! name: "Quarterfinal"
-sf = Stage.create! name: "Semifinal"
-f = Stage.create! name: "Final"
-
 puts "creating stages"
+
+groups = {}
 ("A".."D").each do |char|
-  Group.create! name: "Group #{char}",
-                stage: pre
+  groups[char.to_sym] = Group.create!(name: "Group #{char}")
 end
+qf = PlayOff.create! name: "Quarterfinal"
+sf = PlayOff.create! name: "Semifinal"
+f = PlayOff.create! name: "Final"
+
 
 puts "creating the cup"
 euro2012 = Cup.create! name: "Euro 2012"
@@ -98,13 +98,12 @@ def extract_data(line)
   data.map(&:strip!)
   day, month = data[0].split(/ /)
   hour, minute = data[1].split(":")
-  stage = data[6].sub(/Group.*/,"Preliminary Round")
   result << Time.local(2012, month, day, hour, minute)
   result << data[2]
   result << data[3]
   result << data[4]
   result << data[5]
-  result << stage
+  result << data[6]
   result
 end
 
@@ -130,7 +129,7 @@ final = nil
 text = StringIO.new final_data
 text.each do |line|
   date, place, country, home, guest, stage = extract_data(line)
-  final = PlayOff.create! cup: euro2012,
+  final = PlayOffMatch.create! cup: euro2012,
                           stage_id: stages[stage.to_sym],
                           date: date
 end
@@ -139,7 +138,7 @@ semifinals = []
 text = StringIO.new semifinals_data
 text.each do |line|
   date, place, country, home, guest, stage = extract_data(line)
-  semifinals << (PlayOff.create! cup: euro2012,
+  semifinals << (PlayOffMatch.create! cup: euro2012,
                                  stage_id: stages[stage.to_sym],
                                  date: date,
                                  following_id: final.id)
@@ -149,7 +148,7 @@ quarterfinals = []
 text = StringIO.new quarterfinals_data
 text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
-  quarterfinals[i] = PlayOff.create! cup: euro2012,
+  quarterfinals[i] = PlayOffMatch.create! cup: euro2012,
                                      stage_id: stages[stage.to_sym],
                                      date: date,
                                      following_id: semifinals[i%2].id

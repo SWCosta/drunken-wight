@@ -1,16 +1,6 @@
 class Standing
 
-#  def inspect
-#    to_a.inspect
-#  end
-
-# results for the whole cup
-#  def self.all(args = {})
-#    new(args).results
-#  end
-
   attr_reader :results, :group, :cup
-  #attr_accessor :group
 
   def initialize(args={})
     @group = args[:group_id]
@@ -18,6 +8,7 @@ class Standing
     @results = get_results(args)
   end
 
+  #helper methods for getting nice hirb output
   def get_results(args={})
     Match.find_by_sql(standings_query(args))
   end

@@ -1,4 +1,4 @@
-class PlayOffPresenter < MatchPresenter
+class PlayOffMatchPresenter < MatchPresenter
   def home
     !!match.home ? match.home.country : match.handle_no_team(:home)
   end
