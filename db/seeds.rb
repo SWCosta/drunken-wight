@@ -6,19 +6,19 @@ User.create!( :email => "yuszuv@gmx.de",
 User.create!( :email => "foobar@example.com",
               :password => "foobar" )
 
+puts "creating the cup"
+euro2012 = Cup.create! name: "Euro 2012"
+
 puts "creating stages"
 
 groups = {}
 ("A".."D").each do |char|
-  groups[char.to_sym] = Group.create!(name: "Group #{char}")
+  groups[char.to_sym] = Group.create!(name: "Group #{char}", cup_id: euro2012.id)
 end
-qf = PlayOff.create! name: "Quarterfinal"
-sf = PlayOff.create! name: "Semifinal"
-f = PlayOff.create! name: "Final"
+qf = PlayOff.create! name: "Quarterfinal", cup_id: euro2012.id
+sf = PlayOff.create! name: "Semifinal", cup_id: euro2012.id
+f = PlayOff.create! name: "Final", cup_id: euro2012.id
 
-
-puts "creating the cup"
-euro2012 = Cup.create! name: "Euro 2012"
 
 puts "creating teams in groups"
 teams = ["Poland", "Netherlands", "Spain", "Ukraine", "Greece", "Denmark", "Italy", "Sweden", "Russia", "Germany", "Republic of Ireland", "France", "Czech Republic", "Portugal", "Croatia", "England"]
@@ -116,8 +116,7 @@ text.each do |line|
   date, place, country, home, guest, stage = extract_data(line)
 
   # create models here
-  GroupMatch.create! cup: euro2012,
-                     stage_id: stages[stage.to_sym],
+  GroupMatch.create! stage_id: stages[stage.to_sym],
                      home: teams[home.to_sym],
                      guest: teams[guest.to_sym],
                      date: date
@@ -129,29 +128,26 @@ final = nil
 text = StringIO.new final_data
 text.each do |line|
   date, place, country, home, guest, stage = extract_data(line)
-  final = PlayOffMatch.create! cup: euro2012,
-                          stage_id: stages[stage.to_sym],
-                          date: date
+  final = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                date: date
 end
 
 semifinals = []
 text = StringIO.new semifinals_data
 text.each do |line|
   date, place, country, home, guest, stage = extract_data(line)
-  semifinals << (PlayOffMatch.create! cup: euro2012,
-                                 stage_id: stages[stage.to_sym],
-                                 date: date,
-                                 following_id: final.id)
+  semifinals << (PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                       date: date,
+                                       following_id: final.id)
 end
 
 quarterfinals = []
 text = StringIO.new quarterfinals_data
 text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
-  quarterfinals[i] = PlayOffMatch.create! cup: euro2012,
-                                     stage_id: stages[stage.to_sym],
-                                     date: date,
-                                     following_id: semifinals[i%2].id
+  quarterfinals[i] = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                           date: date,
+                                           following_id: semifinals[i%2].id
 end
 
 puts "creating some match results"
@@ -165,9 +161,11 @@ end
 puts "creating standings after results"
 
 Group.all.each do |group|
-  group.create_standing!
+  standing = group.create_standing!
+  group.teams.each { |team| standing.results.create! team: team }
 end
 
 Cup.all.each do |cup|
-  cup.create_standing!
+  standing = cup.create_standing!
+  cup.teams.each { |team| standing.results.create! team: team }
 end

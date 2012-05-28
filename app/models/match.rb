@@ -24,7 +24,7 @@ class Match < ActiveRecord::Base
   validates :guest_score, numericality: { only_integer: true,
                                           allow_nil: true,
                                           greater_than_or_equal_to: 0 }
-  validates_presence_of :stage_id, :cup_id, :date
+  validates_presence_of :stage_id, :date
 
   default_scope order(:date)
 

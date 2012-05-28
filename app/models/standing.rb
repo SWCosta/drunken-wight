@@ -1,34 +1,43 @@
 class Standing < ActiveRecord::Base
   belongs_to :rateable, polymorphic: true
+  has_many :results, class_name: "StandingTable"
 
-  attr_reader :conn, :group, :cup
-
-  store :data, accessors: [:rank_col, :team_col, :shot_col, :got_col, :points_col, :matches_col]
-
-  after_initialize :set_group_and_cup
-
-  def self.refresh(args={})
-    all.each { |rec| rec.refresh(args) }
-  end
-
-  def refresh(args={})
-    set_group_and_cup
-    results = get_results(args)
-  end
+  attr_reader :conn
 
   def set_connection
     @conn ||= ActiveRecord::Base.connection
   end
 
-  def get_results(args={})
+  def get_results(rateable)
     set_connection
-    conn.exec_query(standings_query(args)).to_a
+    conn.exec_query(standings_query(rateable)).to_a
   end
 
-  def set_group_and_cup
-    @group ||= !!(rateable_type == "Stage") ? rateable_id : nil
-    @cup ||= !!(rateable_type == "Cup") ? rateable_id : Group.find(group).cup.id
+  def update_results
+    results_data = get_results(rateable)
+    results_data.each.with_index do |result,index|
+      row = results.find_by_team_id! result["team_id"]
+      row.update_attributes! rank: (index+1),
+                             team_name: Team.find(result["team_id"].to_i).country,
+                             shot: result["shot"] && result["shot"].to_i,
+                             got: result["got"] && result["got"].to_i,
+                             diff: result["diff"] && result["diff"].to_i,
+                             points: result["points"] && result["points"].to_i,
+                             matches: result["matches"].to_i
+    end
   end
+
+  def group
+    @group ||= !!(rateable_type == "Stage") ? rateable_id : nil
+    @group ? (@cup = rateable.cup) : nil
+    @group
+  end
+
+  def cup
+    @group ? rateable.cup : rateable
+  end
+
+
 
 
 
@@ -53,8 +62,7 @@ class Standing < ActiveRecord::Base
 #  private
 #
   def standings_query(args)
-    args[:order_by] ||= "points DESC NULLS LAST, diff DESC NULLS LAST"
-    raise ArgumentError, ":order_by muss ein String sein" unless args[:order_by].is_a? String
+    order_by = "points DESC NULLS LAST, diff DESC NULLS LAST"
     query= <<EOF
 SELECT	team_id,
 	sum(own_score)		AS	shot,
@@ -96,17 +104,16 @@ FROM
 			AS		other
 			ON		(mp.match_id = other.match_id AND mp.role <> other.role)
 
-	WHERE	mp.team_id	IN
+	WHERE	matches.stage_id	IN
 		(
-		SELECT	teams.id
-		FROM	teams
-	  #{group && "WHERE group_id = #{rateable_id}"}
+		SELECT	id
+		FROM	stages
+		WHERE	stages.cup_id = #{cup.id}	#{group && "AND	stages.id = #{rateable_id}"}
 		)
-    AND matches.cup_id = #{cup}
 	)
 AS		results
 GROUP BY	team_id
-ORDER BY #{args[:order_by]}
+ORDER BY #{order_by}
 EOF
   end
 #

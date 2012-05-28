@@ -1,8 +1,11 @@
 class Group < Stage
   IDS = Group.all.map(&:id)
 
+  delegate :update_results, to: :standing
+
   has_many :teams
   has_one :standing, as: :rateable
+  has_many :results, through: :standing
 
 #  composed_of :standings, mapping: [%w(id group)],
 #                          class_name: "Standing",

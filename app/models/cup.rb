@@ -1,8 +1,12 @@
 class Cup < ActiveRecord::Base
-  has_many :matches
-  has_many :stages, through: :matches
-  has_many :teams, through: :matches
+  delegate :update_results, to: :standing
+
+  has_many :stages
+  has_many :matches, through: :stages
+  has_many :groups
+  has_many :teams, through: :groups
   has_one :standing, as: :rateable
+  has_many :results, through: :standing
 
 #  composed_of :standings, mapping: [%w(id cup)],
 #                          class_name: "Standing",

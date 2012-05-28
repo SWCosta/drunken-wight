@@ -2,7 +2,6 @@ class CreateStandings < ActiveRecord::Migration
   def change
     create_table :standings do |t|
       t.references :rateable, polymorphic: true
-      t.text :data
 
       t.timestamps
     end
