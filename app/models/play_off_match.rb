@@ -5,35 +5,9 @@ class PlayOffMatch < Match
   has_many :parents, foreign_key: :following_id,
                      class_name: "PlayOffMatch"
 
-  #should be triggered otherwise
-  #after_find :set_participants
-
   def get_default(role)
     role = { home: 0, guest: 1 }[role] if role.is_a? Symbol
     participant(role)
-  end
-
-  private
-
-  def set_participants
-    if !home && participant(:home).is_a?(Team)
-      #set home
-      self.home = participant(:home)
-      save!
-    end
-    if !guest && participant(:guest).is_a?(Team)
-      #set guest
-      self.guest = participant(:guest)
-      save!
-    end
-  end
-
-  def undefined_participant_from_group(group_id,position)
-    Struct.new(:group_id, :rank).new(group_id,position)
-  end
-
-  def undefined_participant_from_match(match_id)
-    Struct.new(:match_id).new(match_id)
   end
 
   def participant(role)
@@ -54,11 +28,14 @@ class PlayOffMatch < Match
     end
   end
 
-  def no_team_text(group_id, rank)
-    # generate text ouptput
-    groups = { 0 => "A", 1 => "B", 2 => "C", 3 => "D" }
-    ranks = { 0 => "Sieger", 1 => "Zweiplatzierte" }
-    of = { 0 => "von", 1 => "aus" }
-    "Der #{ranks[rank]} #{of[rank]} Gruppe #{groups[group_id]}"
+  private
+
+  def undefined_participant_from_group(group_id,position)
+    Struct.new(:group_id, :rank).new(group_id,position)
   end
+
+  def undefined_participant_from_match(match_id)
+    Struct.new(:match_id).new(match_id)
+  end
+
 end

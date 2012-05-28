@@ -124,6 +124,24 @@ end
 
 puts "creating playoffs"
 
+Group::IDS = Group.all.map(&:id)
+
+quarterfinals = []
+text = StringIO.new quarterfinals_data
+text.each.with_index do |line,i|
+  date, place, country, home, guest, stage = extract_data(line)
+  quarterfinals[i] = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                           date: date
+end
+
+semifinals = []
+text = StringIO.new semifinals_data
+text.each do |line|
+  date, place, country, home, guest, stage = extract_data(line)
+  semifinals << (PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                       date: date)
+end
+
 final = nil
 text = StringIO.new final_data
 text.each do |line|
@@ -132,33 +150,7 @@ text.each do |line|
                                 date: date
 end
 
-semifinals = []
-text = StringIO.new semifinals_data
-text.each do |line|
-  date, place, country, home, guest, stage = extract_data(line)
-  semifinals << (PlayOffMatch.create!  stage_id: stages[stage.to_sym],
-                                       date: date,
-                                       following_id: final.id)
-end
-
-quarterfinals = []
-text = StringIO.new quarterfinals_data
-text.each.with_index do |line,i|
-  date, place, country, home, guest, stage = extract_data(line)
-  quarterfinals[i] = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
-                                           date: date,
-                                           following_id: semifinals[i%2].id
-end
-
-puts "creating some match results"
-
-Group.first.matches.each do |match|
-  int = proc { ((rand*10).round() - 1)%3}
-  match.result = Result.new(int.call, int.call)
-  match.save
-end
-
-puts "creating standings after results"
+puts "creating standings"
 
 Group.all.each do |group|
   standing = group.create_standing!
@@ -168,4 +160,12 @@ end
 Cup.all.each do |cup|
   standing = cup.create_standing!
   cup.teams.each { |team| standing.results.create! team: team }
+end
+
+puts "creating some match results"
+
+Group.first.matches.each do |match|
+  int = proc { ((rand*10).round() - 1)%3}
+  match.result = Result.new(int.call, int.call)
+  match.save
 end

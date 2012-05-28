@@ -1,6 +1,6 @@
 class Match < ActiveRecord::Base
   belongs_to :stage
-  has_many :match_participations
+  has_many :match_participations, dependent: :destroy
   has_many :teams, through: :match_participations
   has_one :home_participation, class_name: "MatchParticipation",
                                conditions: { role: 0 }
@@ -27,7 +27,8 @@ class Match < ActiveRecord::Base
 
   default_scope order(:date)
 
-  after_save :update_all_results
+  # this can be really expensive
+  after_save :update_all_results, :set_participants
 
   scope :with_result, lambda{ |home,guest| with_result_query(home,guest) }
 
@@ -36,11 +37,6 @@ class Match < ActiveRecord::Base
     where("(matches.home_score = :home AND matches.guest_score = :guest) OR \
            (matches.home_score = :guest AND matches.guest_score = :home)", 
            :home => home, :guest => guest)
-  end
-
-  # so you can call Stage.first.standings.first.team
-  def team
-    home
   end
 
   # returns a Team or nil
@@ -63,6 +59,21 @@ class Match < ActiveRecord::Base
     if home_score_changed? || guest_score_changed?
       stage.update_results
       stage.cup.update_results
+    end
+  end
+
+  def set_participants
+    Match.all.each do |match|
+      if !match.home && match.participant(:home).is_a?(Team)
+        #set home
+        match.home = match.participant(:home)
+        match.save!
+      end
+      if !match.guest && match.participant(:guest).is_a?(Team)
+        #set guest
+        match.guest = match.participant(:guest)
+        match.save!
+      end
     end
   end
 end
