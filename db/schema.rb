@@ -22,9 +22,12 @@ ActiveRecord::Schema.define(:version => 20120527220819) do
 
   create_table "cups", :force => true do |t|
     t.string   "name"
+    t.string   "slug",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  add_index "cups", ["slug"], :name => "index_cups_on_slug", :unique => true
 
   create_table "groups", :force => true do |t|
     t.string   "name"
@@ -48,6 +51,7 @@ ActiveRecord::Schema.define(:version => 20120527220819) do
 
   create_table "matches", :force => true do |t|
     t.string   "type"
+    t.string   "slug",         :null => false
     t.integer  "stage_id"
     t.integer  "home_id"
     t.integer  "guest_id"
@@ -59,17 +63,20 @@ ActiveRecord::Schema.define(:version => 20120527220819) do
     t.datetime "updated_at",   :null => false
   end
 
+  add_index "matches", ["slug"], :name => "index_matches_on_slug"
   add_index "matches", ["stage_id"], :name => "index_matches_on_stage_id"
 
   create_table "stages", :force => true do |t|
     t.string   "name"
     t.string   "type"
+    t.string   "slug",       :null => false
     t.integer  "cup_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
 
   add_index "stages", ["cup_id"], :name => "index_stages_on_cup_id"
+  add_index "stages", ["slug"], :name => "index_stages_on_slug"
 
   create_table "standing_tables", :force => true do |t|
     t.integer  "standing_id"

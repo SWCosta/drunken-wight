@@ -1,4 +1,7 @@
 class Match < ActiveRecord::Base
+  extend FriendlyId
+  friendly_id :slug, use: :scoped, scope: :stage
+
   belongs_to :stage
   has_many :match_participations, dependent: :destroy
   has_many :teams, through: :match_participations
@@ -25,7 +28,7 @@ class Match < ActiveRecord::Base
                                           greater_than_or_equal_to: 0 }
   validates_presence_of :stage_id, :date
 
-  default_scope order(:date)
+  default_scope order(:slug)
 
   # this can be really expensive
   after_save :update_all_results, :set_participants

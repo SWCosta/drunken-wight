@@ -1,10 +1,10 @@
 class MatchesController < CupController
-  before_filter :load_cup_data
+  before_filter :load_cup_data, :set_stage_id
 
   helper_method :current_stage, :current_match
 
   def index
-    @matches = current_stage.matches
+    @matches = current_stage.matches.unscoped.order(:date)
     @standings = current_stage.results.order(:rank) rescue nil
   end
 
@@ -28,11 +28,11 @@ class MatchesController < CupController
   private
 
   def current_stage
-    @current_stage ||= (Stage.find(params[:stage]) rescue @cup)
+    @current_stage ||= (Stage.find(params[:stage_id]) rescue @cup)
   end
 
   def current_match
-    @match ||= (Match.find(params[:id]) rescue nil)
+    @match ||= (current_stage.matches.find(params[:id]) rescue nil)
   end
 
   #def sanatize_params_bla

@@ -1,12 +1,12 @@
 %ul#cup_nav
   %li
-    = link_to @cup.name, matches_path
+    = link_to @cup.name, root_path
   %li
     %ul#stages_nav
       - @stages.each do |stage|
         %li{ :class => stage == current_stage && "current" }
-          = link_to stage.name, matches_path(:stage => stage.id)
-  -if current_match && @stage_matches
+          = link_to stage.name, stage_path(stage.translated)
+  -if current_stage && current_match && @stage_matches
     %li
       %ul#in_stage_nav
         - @stage_matches.each do |match|

@@ -1,4 +1,7 @@
 class Cup < ActiveRecord::Base
+  extend FriendlyId
+  friendly_id :name, use: :slugged
+
   delegate :update_results, to: :standing
 
   has_many :stages
@@ -9,6 +12,8 @@ class Cup < ActiveRecord::Base
                      readonly: true
   has_many :results, through: :standing,
                      readonly: true
+
+
 
   # yields [group, position] to play quarterfinal x as y
   def quarterfinal_mapping(x,y)

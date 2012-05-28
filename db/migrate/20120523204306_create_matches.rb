@@ -2,6 +2,7 @@ class CreateMatches < ActiveRecord::Migration
   def change
     create_table :matches do |t|
       t.string :type
+      t.string :slug, null: false
       t.references :stage
       t.references :home
       t.references :guest
@@ -14,5 +15,6 @@ class CreateMatches < ActiveRecord::Migration
       t.timestamps
     end
     add_index :matches, :stage_id
+    add_index :matches, :slug
   end
 end

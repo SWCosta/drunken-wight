@@ -13,7 +13,9 @@ puts "creating stages"
 
 groups = {}
 ("A".."D").each do |char|
-  groups[char.to_sym] = Group.create!(name: "Group #{char}", cup_id: euro2012.id)
+  groups[char.to_sym] = Group.create!(name: "#{char}",
+                                      cup_id: euro2012.id,
+                                      )
 end
 qf = PlayOff.create! name: "Quarterfinal", cup_id: euro2012.id
 sf = PlayOff.create! name: "Semifinal", cup_id: euro2012.id
@@ -112,11 +114,12 @@ end
 puts "creating the matches in the group period"
 
 text = StringIO.new(timetable)
-text.each do |line|
+text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
 
   # create models here
-  GroupMatch.create! stage_id: stages[stage.to_sym],
+  GroupMatch.create! stage_id: stages[stage.sub(/Group /,"").to_sym],
+                     slug: (((i%6) %2) + i/8*2 + 1),
                      home: teams[home.to_sym],
                      guest: teams[guest.to_sym],
                      date: date
@@ -131,22 +134,25 @@ text = StringIO.new quarterfinals_data
 text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   quarterfinals[i] = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                           slug: (((i%6) %2) + i/8*2 + 1),
                                            date: date
 end
 
 semifinals = []
 text = StringIO.new semifinals_data
-text.each do |line|
+text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   semifinals << (PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                       slug: (((i%6) %2) + i/8*2 + 1),
                                        date: date)
 end
 
 final = nil
 text = StringIO.new final_data
-text.each do |line|
+text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   final = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
+                                slug: (((i%6) %2) + i/8*2 + 1),
                                 date: date
 end
 

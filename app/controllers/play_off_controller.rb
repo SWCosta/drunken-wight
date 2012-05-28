@@ -1,0 +1,1 @@
+class PlayOffController < StagesController; end

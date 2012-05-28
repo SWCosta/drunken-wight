@@ -1,0 +1,1 @@
+class GroupsController < StagesController; end
