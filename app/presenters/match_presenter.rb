@@ -1,6 +1,24 @@
+# encoding: utf-8
+
 class MatchPresenter < BasePresenter
   presents :match
   #delegate :username, to: :user
+  
+  def date
+    match.date.strftime("%d.%m")
+  end
+
+  def time
+    match.date.strftime("%H:%M")
+  end
+
+  def home_score
+    match.home_score || "•"
+  end
+
+  def guest_score
+    match.guest_score || "•"
+  end
 
 
   def avatar

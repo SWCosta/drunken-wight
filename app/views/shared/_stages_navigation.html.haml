@@ -5,7 +5,7 @@
     %ul#stages_nav
       - @stages.each do |stage|
         %li{ :class => stage == current_stage && "current" }
-          = link_to stage.name, stage_path(stage.translated)
+          = link_to stage.name, stage
   -if current_stage && current_match && @stage_matches
     %li
       %ul#in_stage_nav

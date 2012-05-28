@@ -1,18 +1,19 @@
 class Stage < ActiveRecord::Base
   extend FriendlyId
-  friendly_id :name, use: :scoped, scope: :cup
+  friendly_id :slug, use: :scoped, scope: :cup
 
   belongs_to :cup
 
+  default_scope order(:id)
 
   has_many :matches, include: [:match_participations, :home, :guest]
 
   validates_presence_of :cup_id
 
-  def translated
-    output = { "quarterfinal" => "viertelfinale",
+  def slug
+    key = name.parameterize
+    { "quarterfinal" => "viertelfinale",
       "semifinal" => "halbfinale",
-      "final" => "finale" }[slug]
-    output || slug
+      "final" => "finale" }[key] || key
   end
 end

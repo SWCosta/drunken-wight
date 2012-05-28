@@ -1,9 +1,17 @@
 module ApplicationHelper
   def link_to_country(name,align="left")
+    align = align.to_sym
     output = ""
-    output += icon("countries",name) if align == "left"
+    begin
+      output += icon("countries",name) if align == :left
+    rescue
+    end
     output += name
-    output += icon("countries",name) if align == "right"
+    begin
+      output += icon("countries",name) if align == :right
+    rescue
+      output
+    end
     output.html_safe
   end
 

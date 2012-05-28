@@ -13,29 +13,29 @@ class PlayOffMatch < Match
   def participant(role)
     role = { home: 0, guest: 1 }[role] if role.is_a? Symbol
     index = Match.where(stage_id: self.stage_id).reorder(:date).select("id").map(&:id).index(self.id)
-    case stage.name
-    when "Quarterfinal"
-      group_index, position = stage.cup.quarterfinal_mapping(index, role)
-      group = Group.where(id: Group::IDS).reorder(:id)[group_index]
-      group.has_finished? ? group.results[position].team : undefined_participant_from_group(group_index, position)
-    when "Semifinal", "Final"
-      match_count = (stage.name == "Final") ? 1 : 2
-      pre_stage_index = stage.cup.finals_mapping(index, role, match_count)
-      pre_stage = (stage.name == "Final") ? PlayOff.find_by_name("Semifinal") : PlayOff.find_by_name("Quarterfinal")
-      #playoff = PlayOff.where(id: PlayOff::IDS).reorder(:id)[pre_stage_index]
+    case stage.to_param
+    when "viertelfinale" then
+      #debugger
+      cup_id, group_index, position = stage.cup.to_param, *stage.cup.quarterfinal_mapping(index, role)
+      group = stage.cup.groups.reorder(:slug)[group_index]
+      group.has_finished? ? group.results[position].team : undefined_participant_from_group(cup_id, group.to_param, position)
+    when "halbfinale", "finale" then
+      match_count = (stage.to_param == "finale") ? 1 : 2
+      cup_id, pre_stage_index = stage.cup.to_param, *stage.cup.finals_mapping(index, role, match_count)
+      pre_stage = (stage.to_param == "finale") ? stage.cup.stages.find("halbfinale") : stage.cup.stages.find("viertelfinale")
       pre_match = Match.where(stage_id: pre_stage.id).reorder(:date).select("id")[pre_stage_index]
-      pre_match.winner || undefined_participant_from_match(pre_match.id)
+      pre_match.winner || undefined_participant_from_match(cup_id, pre_stage.to_param, pre_stage_index+1)
     end
   end
 
   private
 
-  def undefined_participant_from_group(group_id,position)
-    Struct.new(:group_id, :rank).new(group_id,position)
+  def undefined_participant_from_group(cup_id, group_id,position)
+    Struct.new(:cup_id, :group_id, :rank).new(cup_id, group_id,position)
   end
 
-  def undefined_participant_from_match(match_id)
-    Struct.new(:match_id).new(match_id)
+  def undefined_participant_from_match(cup_id, stage, match_id)
+    Struct.new(:cup_id, :stage, :match_id).new(cup_id, stage, match_id)
   end
 
 end

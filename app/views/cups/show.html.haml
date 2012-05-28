@@ -1,32 +1,6 @@
 = render 'shared/stages_navigation'
 
-%table#matches
-  %thead
-    %th Datum
-    %th
-    %th
-    %th
-    %th
-    %th
-    %th
-  %tbody
-    - @matches.each do |match|
-      - present match do |match_presenter|
-        %tr
-          %td= match_presenter.home
-          %td= match_presenter.guest
-        -#%tr
-          %td
-            = match.date.strftime("%d.%m")
-            = match.date.strftime("%H:%M")
-          %td{ :class => match.winner == match.home && "winner" }
-            = link_to_country(match.home.country, "right")
-          %td= match.home_score || "•"
-          %td= ":"
-          %td= match.guest_score || "•"
-          %td{ :class => match.winner == match.guest && "winner" }
-            = link_to_country(match.guest.country)
-          %td= link_to "Details", match_path(match)
+= render 'shared/timetable'
 
 - if @standings
   %table#standings

@@ -1,0 +1,13 @@
+%table#matches
+  %tbody
+    - @matches.each do |match|
+      - present match do |match_presenter|
+        %tr
+          %td= match_presenter.date
+          %td= match_presenter.time
+          %td.home= link_to_country(match_presenter.home, :right)
+          %td= match_presenter.home_score
+          %td= ":"
+          %td= match_presenter.guest_score
+          %td.guest= link_to_country(match_presenter.guest)
+          %td= link_to "Ergebnis eintragen", "#"

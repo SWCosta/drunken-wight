@@ -15,10 +15,10 @@ class CupsController < ApplicationController
   end
 
   def set_stage_id
-    params[:stage_id] = { "gruppen" => "groups",
-                          "viertelfinale" => "quarterfinal",
-                          "halbfinale" => "semifinal",
-                          "finale" => "final" }[params[:stage_id]]
+#    params[:stage_id] = { "gruppen" => "groups",
+#                          "viertelfinale" => "quarterfinal",
+#                          "halbfinale" => "semifinal",
+#                          "finale" => "final" }[params[:stage_id]]
     params[:stage_id] ||= params[:group_id]
     params[:stage_id] ||= params[:id]
   end

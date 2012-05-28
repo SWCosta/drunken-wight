@@ -7,11 +7,7 @@ class StagesController < CupsController
 
   def show
     @stage = Stage.find(params[:stage_id])
-    @matches = @stage.matches
-#    foobar = play_off_path(Stage.last)
-#    #render text: params.to_yaml.<<(foobar)
-#    sf = Stage.find_by_id(6)
-#    pa = Match.find_by_id(30)
-#    redirect_to sf, pa
+    @matches = @stage.matches.reorder(:date)
+    @standings = @stage.results.order(:rank) rescue nil
   end
 end
