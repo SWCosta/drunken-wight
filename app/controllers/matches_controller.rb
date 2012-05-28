@@ -5,7 +5,7 @@ class MatchesController < ApplicationController
 
   def index
     @matches = current_stage.matches
-    @standings = current_stage.standings
+    @standings = current_stage.results rescue nil
   end
 
   def show

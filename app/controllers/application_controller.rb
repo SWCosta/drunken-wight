@@ -6,6 +6,6 @@ class ApplicationController < ActionController::Base
 
   def load_cup_data
     @cup = Cup.first
-    @stages = @cup.stages.uniq!
+    @stages = @cup.stages.order :id
   end
 end

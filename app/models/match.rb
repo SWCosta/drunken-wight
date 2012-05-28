@@ -1,5 +1,4 @@
 class Match < ActiveRecord::Base
-  belongs_to :cup
   belongs_to :stage
   has_many :match_participations
   has_many :teams, through: :match_participations

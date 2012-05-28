@@ -4,21 +4,11 @@ class Standing < ActiveRecord::Base
 
   attr_reader :conn
 
-  def set_connection
-    @conn ||= ActiveRecord::Base.connection
-  end
-
-  def get_results(rateable)
-    set_connection
-    conn.exec_query(standings_query(rateable)).to_a
-  end
-
   def update_results
     results_data = get_results(rateable)
     results_data.each.with_index do |result,index|
       row = results.find_by_team_id! result["team_id"]
       row.update_attributes! rank: (index+1),
-                             team_name: Team.find(result["team_id"].to_i).country,
                              shot: result["shot"] && result["shot"].to_i,
                              got: result["got"] && result["got"].to_i,
                              diff: result["diff"] && result["diff"].to_i,
@@ -28,7 +18,7 @@ class Standing < ActiveRecord::Base
   end
 
   def group
-    @group ||= !!(rateable_type == "Stage") ? rateable_id : nil
+    @group ||= (rateable_type == "Stage") ? rateable_id : nil
     @group ? (@cup = rateable.cup) : nil
     @group
   end
@@ -37,30 +27,17 @@ class Standing < ActiveRecord::Base
     @group ? rateable.cup : rateable
   end
 
+  private
 
+  def get_results(rateable)
+    set_connection
+    conn.exec_query(standings_query(rateable)).to_a
+  end
 
+  def set_connection
+    @conn ||= ActiveRecord::Base.connection
+  end
 
-
-
-#  attr_reader :results, :group, :cup, :conn
-#
-#  def initialize(args={})
-#    @conn = ActiveRecord::Base.connection
-#    @group = args[:group_id]
-#    @cup = args[:cup_id] || Group.find(@group).cup.id
-#    @results = get_results(args).to_a
-#  end
-#
-#  #helper methods for getting nice hirb output
-#  def get_results(args={})
-#    array = conn.exec_query(standings_query(args)).to_a
-#    table = array.inject([]) do |result,match|
-#      result << StandingRow.new(match["team_id"],match["shot"], match["got"], match["diff"], match["points"], match["matches"])
-#    end
-#  end
-#
-#  private
-#
   def standings_query(args)
     order_by = "points DESC NULLS LAST, diff DESC NULLS LAST"
     query= <<EOF
@@ -116,8 +93,4 @@ GROUP BY	team_id
 ORDER BY #{order_by}
 EOF
   end
-#
-#  def method_missing(name,*args)
-#    results.send(name,*args)
-#  end
 end

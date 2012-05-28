@@ -5,12 +5,10 @@ class Cup < ActiveRecord::Base
   has_many :matches, through: :stages
   has_many :groups
   has_many :teams, through: :groups
-  has_one :standing, as: :rateable
-  has_many :results, through: :standing
-
-#  composed_of :standings, mapping: [%w(id cup)],
-#                          class_name: "Standing",
-#                          constructor: proc { |a| Standing.new( cup_id: a ) }
+  has_one :standing, as: :rateable,
+                     readonly: true
+  has_many :results, through: :standing,
+                     readonly: true
 
   # yields [group, position] to play quarterfinal x as y
   def quarterfinal_mapping(x,y)

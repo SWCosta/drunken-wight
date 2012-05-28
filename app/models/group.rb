@@ -4,16 +4,14 @@ class Group < Stage
   delegate :update_results, to: :standing
 
   has_many :teams
-  has_one :standing, as: :rateable
-  has_many :results, through: :standing
-
-#  composed_of :standings, mapping: [%w(id group)],
-#                          class_name: "Standing",
-#                          constructor: proc { |a| Standing.new({:group_id => a}) }
+  has_one :standing, as: :rateable,
+                     readonly: true
+  has_many :results, through: :standing,
+                     readonly: true
 
   #TODO: make this better
   def has_finished?
-    standings.results.map(&:matches).map(&:to_i).min == (teams.count - 1)
+    results.map(&:matches).map(&:to_i).min == (teams.count - 1)
   end
 
   # checks if there is is a definite winner of a group
