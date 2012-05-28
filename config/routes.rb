@@ -3,14 +3,20 @@ Tippspiel::Application.routes.draw do
 
   get "public/index"
 
-  resources :matches, only: [:index, :show, :edit, :update],
-                      path_names: { edit: 'result' }
-  resources :group_matches, only: [:index, :show, :edit, :update],
-                            path_names: { edit: 'result' },
-                            controller: :matches
-  resources :playoff_matches, only: [:index, :show, :edit, :update],
-                            path_names: { edit: 'result' },
-                            controller: :matches
+  scope :defaults => { cup_id: 1 } do
+    resources :matches, only: [:index, :show, :edit, :update],
+                        path_names: { edit: 'result' }
+    resources :group_matches, only: [:index, :show, :edit, :update],
+                              path_names: { edit: 'result' },
+                              controller: :matches
+    resources :playoff_matches, only: [:index, :show, :edit, :update],
+                              path_names: { edit: 'result' },
+                              controller: :matches
+
+    resources :groups, controller: :stages,
+                       constraints: { id: /[a-dA-D]/ }
+    resources :stages
+  end
 
   root to: "public#index"
 

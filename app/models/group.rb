@@ -36,4 +36,8 @@ class Group < Stage
   def is_a_group?
     id.in? GROUPS
   end
+
+  def to_params
+    name.match(/\w$/)[0].upcase
+  end
 end

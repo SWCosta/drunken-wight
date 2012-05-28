@@ -1,4 +1,4 @@
-class MatchesController < ApplicationController
+class MatchesController < CupController
   before_filter :load_cup_data
 
   helper_method :current_stage, :current_match
