@@ -5,6 +5,12 @@ Tippspiel::Application.routes.draw do
 
   resources :matches, only: [:index, :show, :edit, :update],
                       path_names: { edit: 'result' }
+  resources :group_matches, only: [:index, :show, :edit, :update],
+                            path_names: { edit: 'result' },
+                            controller: :matches
+  resources :playoff_matches, only: [:index, :show, :edit, :update],
+                            path_names: { edit: 'result' },
+                            controller: :matches
 
   root to: "public#index"
 

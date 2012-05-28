@@ -5,7 +5,7 @@ class MatchesController < ApplicationController
 
   def index
     @matches = current_stage.matches
-    @standings = current_stage.results rescue nil
+    @standings = current_stage.results.order(:rank) rescue nil
   end
 
   def show
@@ -34,4 +34,18 @@ class MatchesController < ApplicationController
   def current_match
     @match ||= (Match.find(params[:id]) rescue nil)
   end
+
+  #def sanatize_params_bla
+  #  if params
+  #    debugger
+  #    (res = (params.find{ |k,v| k.to_s =~ /match/ }) ? (params[res[0].sub(/[group_|playoff_]/,"")] = res[1]) : nil)
+  #  end
+  #  #if params
+  #  #  params = Hash[ params.map do |k,v| [
+  #  #    (k =~ /match/) ? k : k.sub(/.*match/,"match"),
+  #  #    v
+  #  #  ]end]
+  #  #end
+  #end
+
 end

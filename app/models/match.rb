@@ -27,6 +27,8 @@ class Match < ActiveRecord::Base
 
   default_scope order(:date)
 
+  after_save :update_all_results
+
   scope :with_result, lambda{ |home,guest| with_result_query(home,guest) }
 
   # get all results with 3:2 or 2:3 e.g.
@@ -55,5 +57,12 @@ class Match < ActiveRecord::Base
 
   def choose_team_from_comparison(int)
     int == 1 ? home : ( int == -1 ? guest : nil ) rescue nil
+  end
+
+  def update_all_results
+    if home_score_changed? || guest_score_changed?
+      stage.update_results
+      stage.cup.update_results
+    end
   end
 end

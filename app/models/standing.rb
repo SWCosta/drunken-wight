@@ -38,8 +38,9 @@ class Standing < ActiveRecord::Base
     @conn ||= ActiveRecord::Base.connection
   end
 
+  # ordering is crucial for correct ranking
   def standings_query(args)
-    order_by = "points DESC NULLS LAST, diff DESC NULLS LAST"
+    order_by = "points DESC NULLS LAST, diff DESC NULLS LAST, shot DESC NULLS LAST, got ASC NULLS LAST"
     query= <<EOF
 SELECT	team_id,
 	sum(own_score)		AS	shot,

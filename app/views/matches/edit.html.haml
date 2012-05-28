@@ -2,7 +2,7 @@
 
 = render 'match_headline'
 
-= simple_form_for @match do |f|
+= simple_form_for @match.becomes(Match) do |f|
   = f.input :home_score, input_html: { maxlength: 1 }
   = f.input :guest_score, input_html: { maxlength: 1 }
   = f.button :submit
