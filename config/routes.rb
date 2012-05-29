@@ -26,10 +26,11 @@ Tippspiel::Application.routes.draw do
                        path: :gruppen,
                        controller: :stages do
         resources :matches, constraints: { id: /\d+/ },
-                            only: [:show, :update],
+                            only: [:show, :update, :edit],
+                            path_names: { edit: 'eintragen' },
                             path: ""
-        get ":id/eintragen", to: "matches#edit",
-                             constraints: { id: /\d+/ }
+        #get ":id/eintragen", to: "matches#edit",
+        #                     constraints: { id: /\d+/ }
 
     end
 
