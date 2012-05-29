@@ -134,7 +134,7 @@ text = StringIO.new quarterfinals_data
 text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   quarterfinals[i] = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
-                                           slug: (((i%6) %2) + i/8*2 + 1),
+                                           slug: (i + 1),
                                            date: date
 end
 
@@ -143,7 +143,7 @@ text = StringIO.new semifinals_data
 text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   semifinals << (PlayOffMatch.create!  stage_id: stages[stage.to_sym],
-                                       slug: (((i%6) %2) + i/8*2 + 1),
+                                       slug: (i + 1),
                                        date: date)
 end
 
@@ -152,7 +152,7 @@ text = StringIO.new final_data
 text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   final = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
-                                slug: (((i%6) %2) + i/8*2 + 1),
+                                slug: (i + 1),
                                 date: date
 end
 

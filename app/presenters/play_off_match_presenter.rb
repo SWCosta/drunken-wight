@@ -19,12 +19,4 @@ class PlayOffMatchPresenter < MatchPresenter
       "Der Sieger aus dem #{Stage.find(alt.stage).name.humanize} #{alt.match_id}"
     end
   end
-
-  def no_team_text(group_id, rank)
-    # generate text ouptput
-    groups = { 0 => "A", 1 => "B", 2 => "C", 3 => "D" }
-    ranks = { 0 => "Sieger", 1 => "Zweiplatzierte" }
-    of = { 0 => "von", 1 => "aus" }
-    "Der #{ranks[rank]} #{of[rank]} Gruppe #{groups[group_id]}"
-  end
 end

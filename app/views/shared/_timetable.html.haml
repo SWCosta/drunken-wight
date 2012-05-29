@@ -10,4 +10,4 @@
           %td= ":"
           %td= match_presenter.guest_score
           %td.guest= link_to_country(match_presenter.guest)
-          %td= link_to "Ergebnis eintragen", "#"
+          %td= link_to "Ergebnis eintragen", polymorphic_path([:edit,match_caster(match)], stage_id: match.stage.to_param)

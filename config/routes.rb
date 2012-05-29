@@ -4,14 +4,6 @@ Tippspiel::Application.routes.draw do
   get "public/index"
 
   scope :defaults => { cup_id: "euro-2012" } do
-    #resources :matches, only: [:index, :show, :edit, :update],
-    #                    path_names: { edit: 'result' }
-    #resources :group_matches, only: [:index, :show, :edit, :update],
-    #                          path_names: { edit: 'result' },
-    #                          controller: :matches
-    #resources :playoff_matches, only: [:index, :show, :edit, :update],
-    #                            path_names: { edit: 'result' },
-    #                            controller: :matches
 
     get ":stage_id", to: "stages#show", as: :play_off, constraints: { stage_id: /viertelfinale|halbfinale|finale|quarterfinal|semifinal|final/ }
     put ":stage_id", to: "stages#update", constraints: { stage_id: /viertelfinale|halbfinale|finale|quarterfinal|semifinal|final/ }
@@ -23,15 +15,28 @@ Tippspiel::Application.routes.draw do
                  to: "matches#update",
                  constraints: { id: /\d+/ }
     end
+    get "finale/eintragen", to: "matches#edit", defaults: { stage_id: "finale", id: 1 }, as: :edit_final_match
+    scope ":stage_id", as: :edit_play_off, constraints: { stage_id: /viertelfinale|halbfinale|quarterfinal|semifinal|finale|final/ } do
+      get ":id/eintragen", as: :match,
+                           to: "matches#edit",
+                           constraints: { id: /\d+/ }
+    end
     resources :groups, constraints: { id: /[a-d]/ },
                        only: [:show, :update, :index],
                        path: :gruppen,
                        controller: :stages do
         resources :matches, constraints: { id: /\d+/ },
-                            only: [:show, :edit, :update],
-                            path_name: { edit: 'eintragen' },
+                            only: [:show, :update],
                             path: ""
+        get ":id/eintragen", to: "matches#edit",
+                             constraints: { id: /\d+/ }
+
     end
+
+    resources :matches, only: [:edit, :update],
+                        path: :spiele,
+                        path_names: { edit: 'eintragen' },
+                        constraints: { id: /\d+/ }
     
     root to: "cups#show"
   end

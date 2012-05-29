@@ -1,4 +1,4 @@
-class MatchesController < CupController
+class MatchesController < CupsController
   before_filter :load_cup_data, :set_stage_id
 
   helper_method :current_stage, :current_match
@@ -9,11 +9,13 @@ class MatchesController < CupController
   end
 
   def show
-    @stage_matches = current_match.stage.matches
+    #@stage_matches = current_match.stage.matches
+    @match = Match.find(params[:id])
   end
 
   def edit
-    @stage_matches = current_match.stage.matches
+    #@stage_matches = current_match.stage.matches
+    @match = Match.find(params[:id])
   end
 
   def update
@@ -27,13 +29,13 @@ class MatchesController < CupController
 
   private
 
-  def current_stage
-    @current_stage ||= (Stage.find(params[:stage_id]) rescue @cup)
-  end
-
-  def current_match
-    @match ||= (current_stage.matches.find(params[:id]) rescue nil)
-  end
+#  def current_stage
+#    @current_stage ||= (Stage.find(params[:stage_id]) rescue @cup)
+#  end
+#
+#  def current_match
+#    @match ||= (current_stage.matches.find(params[:id]) rescue nil)
+#  end
 
   #def sanatize_params_bla
   #  if params
