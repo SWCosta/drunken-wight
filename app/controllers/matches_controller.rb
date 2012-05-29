@@ -14,8 +14,8 @@ class MatchesController < CupsController
   end
 
   def edit
-    #@stage_matches = current_match.stage.matches
-    @match = Match.find(params[:id])
+    @stage_matches ||= stage_matches
+    @match = current_stage.matches.find(params[:id])
   end
 
   def update
@@ -28,6 +28,10 @@ class MatchesController < CupsController
   end
 
   private
+
+  def stage_matches
+    @stage_matches ||= current_stage && current_stage.matches
+  end
 
 #  def current_stage
 #    @current_stage ||= (Stage.find(params[:stage_id]) rescue @cup)

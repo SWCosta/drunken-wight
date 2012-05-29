@@ -6,9 +6,10 @@
       - @stages.each do |stage|
         %li{ :class => stage == current_stage && "current" }
           = link_to stage.name, stage
-  -if current_stage && current_match && @stage_matches
+  -if current_stage && stage_matches && @match && !(request.path =~ /^\/spiele|finale/)
     %li
       %ul#in_stage_nav
         - @stage_matches.each do |match|
-          %li{ :class => match.id.to_s == @match.id.to_s && "current" }
-            = link_to "#{match.home.country} -- #{match.guest.country}", match
+          - present match do |match_presenter|
+            %li{ :class => match.id.to_s == @match.id.to_s && "current" }
+              = link_to "#{match_presenter.home} -- #{match_presenter.guest}", show_match_caster(match)

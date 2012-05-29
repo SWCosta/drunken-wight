@@ -1,7 +1,7 @@
 class CupsController < ApplicationController
   before_filter :load_cup_data, :handle_sti
 
-  helper_method :current_stage
+  helper_method :current_stage, :stage_matches
 
   def show
     @matches = @cup.matches.unscoped.order(:date)
@@ -11,14 +11,14 @@ class CupsController < ApplicationController
   private
 
   def current_stage
+    @cup.stages.find(params[:stage_id]) rescue nil
+  end
+
+  def stage_matches
     nil
   end
 
   def set_stage_id
-#    params[:stage_id] = { "gruppen" => "groups",
-#                          "viertelfinale" => "quarterfinal",
-#                          "halbfinale" => "semifinal",
-#                          "finale" => "final" }[params[:stage_id]]
     params[:stage_id] ||= params[:group_id]
     params[:stage_id] ||= params[:id]
   end

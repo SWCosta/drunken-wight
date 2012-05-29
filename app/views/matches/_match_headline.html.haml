@@ -1,6 +1,7 @@
 %h1
-  = country_image @match.home.country
-  = @match.home.country
-  = ":"
-  = @match.guest.country
-  = country_image @match.guest.country
+  - present @match do |match_presenter|
+    = country_image match_presenter.home
+    = match_presenter.home
+    = ":"
+    = match_presenter.guest
+    = country_image match_presenter.guest

@@ -5,6 +5,11 @@ Tippspiel::Application.routes.draw do
 
   scope :defaults => { cup_id: "euro-2012" } do
 
+    resources :matches, only: [:edit, :update, :show],
+                        path: :spiele,
+                        path_names: { edit: 'eintragen' },
+                        constraints: { id: /\d+/ }
+    
     get ":stage_id", to: "stages#show", as: :play_off, constraints: { stage_id: /viertelfinale|halbfinale|finale|quarterfinal|semifinal|final/ }
     put ":stage_id", to: "stages#update", constraints: { stage_id: /viertelfinale|halbfinale|finale|quarterfinal|semifinal|final/ }
     scope ":stage_id", as: :play_off, constraints: { stage_id: /viertelfinale|halbfinale|quarterfinal|semifinal/ } do
@@ -15,7 +20,7 @@ Tippspiel::Application.routes.draw do
                  to: "matches#update",
                  constraints: { id: /\d+/ }
     end
-    get "finale/eintragen", to: "matches#edit", defaults: { stage_id: "finale", id: 1 }, as: :edit_final_match
+    get "finale/eintragen", to: "matches#edit", defaults: { stage_id: "finale", id: "1" }, as: :edit_final_match
     scope ":stage_id", as: :edit_play_off, constraints: { stage_id: /viertelfinale|halbfinale|quarterfinal|semifinal|finale|final/ } do
       get ":id/eintragen", as: :match,
                            to: "matches#edit",
@@ -34,11 +39,6 @@ Tippspiel::Application.routes.draw do
 
     end
 
-    resources :matches, only: [:edit, :update],
-                        path: :spiele,
-                        path_names: { edit: 'eintragen' },
-                        constraints: { id: /\d+/ }
-    
     root to: "cups#show"
   end
 
