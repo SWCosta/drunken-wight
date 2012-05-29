@@ -60,7 +60,7 @@ class Match < ActiveRecord::Base
 
   def update_all_results
     if home_score_changed? || guest_score_changed?
-      stage.update_results
+      stage.update_results if stage.is_a? Group
       stage.cup.update_results
     end
   end
