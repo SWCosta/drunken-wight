@@ -9,19 +9,20 @@ class MatchesController < CupsController
   end
 
   def show
-    #@stage_matches = current_match.stage.matches
-    @match = Match.find(params[:id])
+    @stage_matches = stage_matches
+    @match = current_match
   end
 
   def edit
-    @stage_matches ||= stage_matches
-    @match = current_stage.matches.find(params[:id])
+    @stage_matches = stage_matches
+    @match = current_match
   end
 
   def update
+    debugger
     @match = current_match
     if @match.update_attributes(params[:match])
-      redirect_to @match, notice: "Erfolgreich aktualisiert"
+      redirect_to redirect_path(@match), notice: "Erfolgreich aktualisiert"
     else
       render :edit
     end
@@ -29,29 +30,20 @@ class MatchesController < CupsController
 
   private
 
-  def stage_matches
-    @stage_matches ||= current_stage && current_stage.matches
+  def redirect_path(match=nil)
+    if request.path =~ /^\/spiele/
+      root_path
+    else
+      view_context.show_match_caster(@match)
+    end
   end
 
-#  def current_stage
-#    @current_stage ||= (Stage.find(params[:stage_id]) rescue @cup)
-#  end
-#
-#  def current_match
-#    @match ||= (current_stage.matches.find(params[:id]) rescue nil)
-#  end
+  def stage_matches
+    @stage_matches ||= (current_stage && current_stage.matches)
+  end
 
-  #def sanatize_params_bla
-  #  if params
-  #    debugger
-  #    (res = (params.find{ |k,v| k.to_s =~ /match/ }) ? (params[res[0].sub(/[group_|playoff_]/,"")] = res[1]) : nil)
-  #  end
-  #  #if params
-  #  #  params = Hash[ params.map do |k,v| [
-  #  #    (k =~ /match/) ? k : k.sub(/.*match/,"match"),
-  #  #    v
-  #  #  ]end]
-  #  #end
-  #end
+  def current_match
+    @match ||= (current_stage.matches.find(params[:id]) rescue nil)
+  end
 
 end
