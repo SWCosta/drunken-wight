@@ -19,7 +19,6 @@ class MatchesController < CupsController
   end
 
   def update
-    debugger
     @match = current_match
     if @match.update_attributes(params[:match])
       redirect_to redirect_path(@match), notice: "Erfolgreich aktualisiert"
@@ -33,8 +32,10 @@ class MatchesController < CupsController
   def redirect_path(match=nil)
     if request.path =~ /^\/spiele/
       root_path
+    elsif @match.is_a? GroupMatch
+      view_context.group_path(params[:group_id])
     else
-      view_context.show_match_caster(@match)
+      view_context.play_off_path(params[:stage_id])
     end
   end
 

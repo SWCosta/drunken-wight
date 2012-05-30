@@ -12,7 +12,7 @@ Tippspiel::Application.routes.draw do
     
     get ":stage_id", to: "stages#show", as: :play_off, constraints: { stage_id: /viertelfinale|halbfinale|finale|quarterfinal|semifinal|final/ }
     put ":stage_id", to: "stages#update", constraints: { stage_id: /viertelfinale|halbfinale|finale|quarterfinal|semifinal|final/ }
-    scope ":stage_id", as: :play_off, constraints: { stage_id: /viertelfinale|halbfinale|quarterfinal|semifinal/ } do
+    scope ":stage_id", as: :play_off, constraints: { stage_id: /viertelfinale|halbfinale|quarterfinal|semifinal|finale|final/ } do
       get ":id", as: :match,
                  to: "matches#show",
                  constraints: { id: /\d+/ }
