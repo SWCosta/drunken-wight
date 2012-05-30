@@ -18,13 +18,11 @@ class Standing < ActiveRecord::Base
   end
 
   def group
-    @group ||= (rateable_type == "Stage") ? rateable_id : nil
-    @group ? (@cup = rateable.cup) : nil
-    @group
+    rateable_type == "Cup" ? nil : rateable_id
   end
 
   def cup
-    @group ? rateable.cup : rateable
+    rateable_type == "Cup" ? rateable_id : rateable.cup.id
   end
 
   private
@@ -86,7 +84,7 @@ FROM
 		(
 		SELECT	id
 		FROM	stages
-		WHERE	stages.cup_id = #{cup.id}	#{group && "AND	stages.id = #{rateable_id}"}
+		WHERE	stages.cup_id = #{cup}	#{group && "AND	stages.id = #{group}"}
 		)
 	)
 AS		results
