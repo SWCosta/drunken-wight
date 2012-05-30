@@ -6,47 +6,108 @@ $blueprint_grid_width: 40px
 
 @import "blueprint"
 
-$icon-margin: 2px
+$accent-color: #FF0D00
+
+$icon-margin: 3px
 
 $countries-sprite-dimensions: true
 $countries-sprite-base-class: "icon-countries"
 @import "countries/*.png"
 +all-countries-sprites
-$country-height: countries-sprite-height(sweden)
-$country-width: countries-sprite-width(sweden)
+$country-height: countries-sprite-height(sweden-icon)
+$country-width: countries-sprite-width(sweden-icon)
 
 =icons($height, $width, $margin: $icon-margin)
   display: inline-block
   width: $width
   height: $height
   line-height: $height
-  vertical-align: text-top
+  vertical-align: middle
   margin: $margin
+
+=font-default
+  font-family: Verdana
+  font-size: 1em
+  line-height: 1.5em
+  font-weight: normal
+  font-style: normal
+
++blueprint-form
+
+html
+  +font-default
 
 i[class^=countries]
   +icons($country-height, 20px)
+
+$table-base-padding: 5px
+=stripped-table
+  +alternating-rows-and-columns(#fff,#ddd,#000)
+  thead
+    border-bottom: 2px solid #000
+    margin-bottom: 2px
+  th
+    font-weight: bold
+    padding: $table-base-padding
+    padding-bottom: $table-base-padding * 1.5
+  tbody
+    margin-top: 2px
+  td
+    padding: $table-base-padding
 
 #content
   +container
   //+showgrid
   #header, #footer
-    +column($blueprint_grid_columns)
-    +background-image(linear-gradient(#c5c5c5,#3d3d3d))
+    +column($blueprint_grid_columns,true)
   #nav
-    +column($blueprint_grid_columns/4)
+    +column($blueprint_grid_columns,true)
+    ul
+      +float-right
+      +delimited-list(" •")
   #main
-    +column($blueprint_grid_columns*3/4, true)
+    +column($blueprint_grid_columns - 2,true)
+    +push(1)
+
+#header 
+  +background-image(linear-gradient(right center,#c5c5c5,#3d3d3d))
+  border-bottom: 3px solid $accent-color
+  +single-box-shadow
+  h1
+    font-size: 2em
+    font-weight: bold
+    color: #fff
+    margin: 20px 10px
+  
 
 //#stages_nav
 #cup_nav
   ul
     +horizontal-list
+    padding: 2px
   .current
     font-weight: bold
 
+
 table#matches
-  td:nth-child(3)
-    text-align: right
+  width: span($blueprint_grid_columns - 2)
+  +stripped-table
+  td
+    padding: $table-base-padding
+    &:nth-child(1), &:nth-child(2)
+      width: span(2)
+    &:nth-child(3)
+      text-align: right
+      width: span(5)
+    &:nth-child(4)
+      padding: $table-base-padding 0px 
+    &:nth-child(5)
+      padding: $table-base-padding 0px
+      width: span(5)
+
+table#standings
+  width: span($blueprint_grid_columns - 2)
+  +stripped-table
 
 .winner
   background-color: green

@@ -1,7 +1,8 @@
 #!/bin/sh
 
-for file in $(ls .)
+for file in $(ls ./*.png)
 do
-  convert ${file} -resize '1000x12>' ${file}
+  #convert ${file} -resize '18x1000>' ${file} # converts with ratio
+  convert ${file} -sample '18x12!' ${file}
 done
 

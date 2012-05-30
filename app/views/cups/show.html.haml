@@ -15,7 +15,7 @@
       - @standings.order(:rank).each do |row|
         %tr
           %td= row.rank
-          %td= row.team_name
+          %td= country_with_flag(row.team_name)
           %td= row.shot
           %td= row.got
           %td= row.diff

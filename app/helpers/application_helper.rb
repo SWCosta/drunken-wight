@@ -2,6 +2,12 @@ module ApplicationHelper
   def link_to_country(name,align="left")
     align = align.to_sym
     output = ""
+    output += country_with_flag(name,align)
+    output.html_safe
+  end
+
+  def country_with_flag(name,align=(:left))
+    output=""
     begin
       output += icon("countries",name) if align == :left
     rescue
@@ -16,11 +22,11 @@ module ApplicationHelper
   end
 
   def icon(namespace=nil,name)
-    content_tag :i, :class => [namespace,name.parameterize].join("-") do; end
+    content_tag :i, :class => [namespace,name.parameterize,"icon"].join("-") do; end
   end
 
   def country_image(name)
-    image_tag File.join("countries", name.parameterize+".png")
+    image_tag File.join("countries", name.parameterize+"-icon.png")
   end
 
   def present(object, context = :collection, klass = nil)
