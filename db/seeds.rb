@@ -100,12 +100,12 @@ def extract_data(line)
   data.map(&:strip!)
   day, month = data[0].split(/ /)
   hour, minute = data[1].split(":")
-  result << Time.local(2012, month, day, hour, minute)
-  result << data[2]
-  result << data[3]
-  result << data[4]
-  result << data[5]
-  result << data[6]
+  result << Time.local(2012, month, day, hour, minute) #datetime
+  result << data[2] # place
+  result << data[3] # country
+  result << data[4] # home
+  result << data[5] # guest
+  result << data[6] # stage
   result
 end
 
@@ -120,6 +120,8 @@ text.each.with_index do |line,i|
   # create models here
   GroupMatch.create! stage_id: stages[stage.sub(/Group /,"").to_sym],
                      slug: (((i%6) %2) + i/8*2 + 1),
+                     place: place,
+                     country: country,
                      home: teams[home.to_sym],
                      guest: teams[guest.to_sym],
                      date: date
@@ -135,6 +137,8 @@ text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   quarterfinals[i] = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
                                            slug: (i + 1),
+                                           place: place,
+                                           country: country,
                                            date: date
 end
 
@@ -144,6 +148,8 @@ text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   semifinals << (PlayOffMatch.create!  stage_id: stages[stage.to_sym],
                                        slug: (i + 1),
+                                       place: place,
+                                       country: country,
                                        date: date)
 end
 
@@ -153,6 +159,8 @@ text.each.with_index do |line,i|
   date, place, country, home, guest, stage = extract_data(line)
   final = PlayOffMatch.create!  stage_id: stages[stage.to_sym],
                                 slug: (i + 1),
+                                place: place,
+                                country: country,
                                 date: date
 end
 

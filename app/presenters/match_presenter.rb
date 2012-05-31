@@ -4,11 +4,19 @@ class MatchPresenter < BasePresenter
   presents :match
   
   def date
-    match.date.strftime("%d.%m")
+    match.date.strftime("%d.%m.")
   end
 
   def time
     match.date.strftime("%H:%M")
+  end
+
+  def place
+    match.place
+  end
+
+  def country
+    match.country
   end
 
   def home_score

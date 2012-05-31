@@ -92,18 +92,20 @@ $table-base-padding: 5px
 table#matches
   width: span($blueprint_grid_columns - 2)
   +stripped-table
-  td
+  td, th
     padding: $table-base-padding
     &:nth-child(1), &:nth-child(2)
       width: span(2)
-    &:nth-child(3)
+    &:nth-child(4)
       text-align: right
       width: span(5)
-    &:nth-child(4)
-      padding: $table-base-padding 0px 
     &:nth-child(5)
+      padding: $table-base-padding 0px 
+    &:nth-child(6)
       padding: $table-base-padding 0px
       width: span(5)
+    &:last-child
+      text-align: right
 
 table#standings
   width: span($blueprint_grid_columns - 2)

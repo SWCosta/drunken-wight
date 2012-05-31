@@ -1,10 +1,20 @@
 %table#matches
+  %thead
+    %tr
+      %th Datum
+      %th Anstoß
+      %th Ort
+      %th Heim
+      %th
+      %th Gast
+      %th
   %tbody
     - @matches.each do |match|
       - present match do |match_presenter|
         %tr
           %td= match_presenter.date
           %td= match_presenter.time
+          %td= match_presenter.place
           %td= link_to_country(match_presenter.home, :right)
           %td= "#{match_presenter.home_score} : #{match_presenter.guest_score}"
           %td= link_to_country(match_presenter.guest)

@@ -6,7 +6,8 @@
   %table#standings
     %thead
       %th #
-      %th T
+      %th Mannschaft
+      %th Spiele
       %th +
       %th -
       %th Δ
@@ -16,6 +17,7 @@
         %tr
           %td= row.rank
           %td= country_with_flag(row.team_name)
+          %td= row.matches
           %td= row.shot
           %td= row.got
           %td= row.diff

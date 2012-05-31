@@ -23,7 +23,7 @@ class PlayOffMatch < Match
       match_count = (stage.to_param == "finale") ? 1 : 2
       cup_id, pre_stage_index = stage.cup.to_param, *stage.cup.finals_mapping(index, role, match_count)
       pre_stage = (stage.to_param == "finale") ? stage.cup.stages.find("halbfinale") : stage.cup.stages.find("viertelfinale")
-      pre_match = Match.where(stage_id: pre_stage.id).reorder(:date).select("id")[pre_stage_index]
+      pre_match = Match.where(stage_id: pre_stage.id).reorder(:date)[pre_stage_index]
       pre_match.winner || undefined_participant_from_match(cup_id, pre_stage.to_param, pre_stage_index+1)
     end
   end
