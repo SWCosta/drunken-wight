@@ -15,6 +15,7 @@ gem 'haml-rails'
 gem 'hirb'
 gem 'awesome_print'
 gem 'annotate', :git => 'git://github.com/ctran/annotate_models.git'
+gem 'fancybox-rails'
 
 gem 'devise'
 gem 'simple_form'

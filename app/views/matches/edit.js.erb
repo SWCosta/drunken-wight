@@ -1,2 +1,3 @@
 data = $("<%= escape_javascript( render 'match_form') %>");
-console.log(data.html());
+$.fancybox({ content: $(data), transitionIn: 'fade', transitionOut: 'fade'});
+$("table#match input:first").focus();
