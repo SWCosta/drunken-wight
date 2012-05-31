@@ -29,6 +29,10 @@ module ApplicationHelper
     image_tag File.join("countries", name.parameterize+"-icon.png")
   end
 
+  def country_flag(name)
+    image_tag File.join("countries", name.parameterize+"-flag.png")
+  end
+
   def present(object, context = :collection, klass = nil)
     klass ||= "#{object.class}Presenter".constantize
     context.in?(:collection, :member) || (context = :collection)

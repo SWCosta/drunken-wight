@@ -1,0 +1,17 @@
+= simple_form_for match_type_caster(@match), url: edit_match_caster(@match) do |f|
+  %table#match
+    %tr
+      %td
+        = country_flag(@match.home.country)
+        %h4= @match.home.country
+      %td
+        = country_flag(@match.guest.country)
+        %h4= @match.guest.country
+    %tr
+      %td
+        = f.input_field :home_score, input_html: { maxlength: 1 }
+      %td
+        = f.input_field :guest_score, input_html: { maxlength: 1 }
+    %tr
+      %td{ colspan: 2 }
+        = f.button :submit

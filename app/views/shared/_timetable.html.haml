@@ -18,4 +18,4 @@
           %td= link_to_country(match_presenter.home, :right)
           %td= "#{match_presenter.home_score} : #{match_presenter.guest_score}"
           %td= link_to_country(match_presenter.guest)
-          %td= link_to "Ergebnis eintragen", polymorphic_path([:edit,match_caster(match)], query_caster(request.path,match))
+          %td= link_to "Ergebnis eintragen", polymorphic_path([:edit,match_caster(match)], query_caster(request.path,match)), remote: true

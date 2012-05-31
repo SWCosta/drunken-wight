@@ -14,8 +14,11 @@ class MatchesController < CupsController
   end
 
   def edit
-    @stage_matches = stage_matches
     @match = current_match
+    respond_to do |format|
+      format.html { @stage_matches = stage_matches }
+      format.js {}
+    end
   end
 
   def update

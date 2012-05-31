@@ -32,9 +32,19 @@ $country-width: countries-sprite-width(sweden-icon)
   font-weight: normal
   font-style: normal
 
+h2
+  font-size: 1.7em
+
+h3
+  font-size: 1.5em
+
+h4
+  font-size: 1.3em
+
 +blueprint-form
 
-html
+
+html, body
   +font-default
 
 i[class^=countries]
@@ -101,6 +111,8 @@ table#matches
       width: span(5)
     &:nth-child(5)
       padding: $table-base-padding 0px 
+      width: span(1.5)
+      text-align: center
     &:nth-child(6)
       padding: $table-base-padding 0px
       width: span(5)
@@ -110,6 +122,22 @@ table#matches
 table#standings
   width: span($blueprint_grid_columns - 2)
   +stripped-table
+
+
+table#match
+  margin: auto
+  width: 400px
+  td
+    padding: $table-base-padding
+    width: 200px
+    &:first-child
+      text-align: right
+    &:last-child
+      text-align: left
+  input.numeric
+    width: 25px
+  tr:last-child td
+    text-align: center
 
 .winner
   background-color: green
