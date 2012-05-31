@@ -1,0 +1,16 @@
+common: &psql
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+
+development:
+  <<: *psql
+  database: tippspiel_dev
+
+test:
+  <<: *psql
+  database: tippspiel_test
+
+production:
+  <<: *psql
+  database: tippspiel_production
