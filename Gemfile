@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
 gem 'rails', '3.2.2'
-#gem 'capistrano'
-#gem 'rvm-capistrano'
+gem 'capistrano'
+gem 'rvm-capistrano'
 #gem 'passenger', '3.0.12'
 
 gem 'pg'
