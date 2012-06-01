@@ -4,13 +4,12 @@
 
 @import "compass"
 @import "compass/reset"
+@import "solarized"
 
 $blueprint_grid_columns: 24
 $blueprint_grid_width: 40px
 
 @import "blueprint"
-
-$accent-color: #FF0D00
 
 $icon-margin: 3px
 
@@ -40,15 +39,16 @@ h2
   font-size: 1.7em
 
 h3
-  font-size: 1.5em
+  font-size: 1.4em
 
 h4
-  font-size: 1.3em
+  font-size: 1.2em
 
 +blueprint-form
 
 
 html, body
+  +rebase($base3,$base2,$base1,$base0,$base00,$base01,$base02,$base03)
   +font-default
 
 i[class^=countries]
@@ -56,7 +56,7 @@ i[class^=countries]
 
 $table-base-padding: 5px
 =stripped-table
-  +alternating-rows-and-columns(#fff,#ddd,#000)
+  //+alternating-rows-and-columns(#fff,$yellow,#000)
   thead
     border-bottom: 2px solid #000
     margin-bottom: 2px
@@ -84,23 +84,45 @@ $table-base-padding: 5px
     +push(1)
 
 #header 
-  +background-image(linear-gradient(right center,#c5c5c5,#3d3d3d))
-  border-bottom: 3px solid $accent-color
+  +accentize($cyan)
+  +background-image(linear-gradient(right center,$base02,$base3))
+  border-bottom: 3px solid $red
   +single-box-shadow
   h1
+    font-family: Helvetica, sans
     font-size: 2em
     font-weight: bold
-    color: #fff
     margin: 20px 10px
   
 
 //#stages_nav
 #cup_nav
+  a
+    +border-radius(6px)
+    border: 1px solid $base2
+    background-color: $cyan
+    color: $base3
+    text-decoration: none
+    padding: 4px 10px
+    display: inline-block
+    +single-text-shadow
+    +background-image(linear-gradient(right center, $cyan, lighten($cyan, 5%)))
   ul
     +horizontal-list
     padding: 2px
-  .current
-    font-weight: bold
+  .current a
+    background-color: $orange
+  & > li:first-child a
+    font-size: 1.8em
+    line-height: 1em
+  & #stages_nav li a
+    font-size: 1.4em
+    line-height: 1em
+  & #in_stages_nav li a
+    font-size: 1.2em
+    line-height: 1em
+
+
 
 
 table#matches
@@ -147,3 +169,6 @@ table#match
 
 .winner
   background-color: green
+
+#fancybox-outer
+  background-color: $base3
